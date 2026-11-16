@@ -163,8 +163,15 @@ button { cursor: pointer; }
 }
 .ayah .tr { margin: 6px 0 2px; font-size: 15px; line-height: 1.6; color: var(--ink); text-align: left; max-width: 65ch; }
 .bismillah-tr { text-align: center; color: var(--muted); font-size: 14px; margin: 0 0 6px; }
-body.no-tr .tr, body.no-tr .bismillah-tr { display: none; }
-.surah-head .chip { margin-top: 12px; }
+.tr:empty, .bismillah-tr:empty { display: none; }
+.tr:lang(ml), .tr:lang(ta), .tr:lang(hi) { line-height: 1.75; }
+.lang { display: inline-flex; align-items: center; gap: 8px; margin-top: 12px; font-size: 13px; font-weight: 600; color: var(--muted); }
+.lang select {
+  height: 36px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface);
+  padding: 0 12px; font-size: 14px; font-weight: 600; color: var(--ink);
+}
+.lang-note { margin: 8px 0 0; font-size: 13px; color: var(--muted); }
+.lang-note.bad { color: #b3261e; }
 .ayah .tools { display: flex; align-items: center; gap: 8px; margin-top: 4px; }
 .ayah .ref { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; margin-right: auto; }
 .chip {
@@ -227,7 +234,7 @@ body.has-player .wrap { padding-bottom: 150px; }
   </div>
   <ul id="list" class="list"></ul>
   <p id="empty" class="empty" hidden></p>
-  <p class="credit">Arabic text: Uthmani script from the Noble Qur'an Encyclopedia (quranenc.com), via the open quran-json project. English meaning: Saheeh International translation, from the same source. Recitations stream from the Islamic Network CDN (alquran.cloud) and EveryAyah, and need an internet connection.</p>
+  <p class="credit">Arabic text: Uthmani script from the Noble Qur'an Encyclopedia (quranenc.com), via the open quran-json project. Meanings: English (Saheeh International), Malayalam (Abdul Hameed Madani and Kunhi Mohammed), Tamil (Abdulhameed Baqavi), Hindi (Maulana Azizul Haque Al Umari), as published by QuranEnc.com and the King Fahd Quran Complex. Recitations stream from the Islamic Network CDN (alquran.cloud) and EveryAyah, and need an internet connection.</p>
 </main>
 
 <!-- Reader -->
@@ -245,7 +252,16 @@ body.has-player .wrap { padding-bottom: 150px; }
     <div class="surah-head">
       <div class="ar" id="r-ar" lang="ar" dir="rtl"></div>
       <p id="r-meta"></p>
-      <button id="tr-toggle" class="chip" type="button" aria-pressed="true">Meaning: On</button>
+      <label class="lang" for="lang"><span>Meaning</span>
+        <select id="lang">
+          <option value="en">English</option>
+          <option value="ml" lang="ml">മലയാളം (Malayalam)</option>
+          <option value="ta" lang="ta">தமிழ் (Tamil)</option>
+          <option value="hi" lang="hi">हिन्दी (Hindi)</option>
+          <option value="off">Off</option>
+        </select>
+      </label>
+      <p id="lang-note" class="lang-note" role="status" hidden></p>
     </div>
     <div id="verses"></div>
     <div class="pager">
@@ -276,11 +292,10 @@ body.has-player .wrap { padding-bottom: 150px; }
 </div>
 
 <script src="quran-data.js"></script>
-<script src="quran-en.js"></script>
 <script>
 (function () {
   "use strict";
-  var Q = window.QURAN || [], JUZ = window.JUZ || [], EN = window.QURAN_EN || [];
+  var Q = window.QURAN || [], JUZ = window.JUZ || [];
   var $ = function (id) { return document.getElementById(id); };
 
   /* ---------- saved state (this browser only) ---------- */
@@ -438,7 +453,7 @@ body.has-player .wrap { padding-bottom: 150px; }
       var bis = el("p", "bismillah", Q[0][4][0]);
       bis.lang = "ar";
       box.appendChild(bis);
-      if (EN[0]) box.appendChild(el("p", "bismillah-tr", EN[0][0]));
+      box.appendChild(el("p", "bismillah-tr", ""));
     }
     if (observer) observer.disconnect();
     observer = ("IntersectionObserver" in window) ? new IntersectionObserver(function (entries) {
@@ -465,7 +480,7 @@ body.has-player .wrap { padding-bottom: 150px; }
       p.lang = "ar";
       p.appendChild(el("span", "n", arNum(a)));
       row.appendChild(p);
-      if (EN[n - 1] && EN[n - 1][idx]) row.appendChild(el("p", "tr", EN[n - 1][idx]));
+      row.appendChild(el("p", "tr", ""));
 
       var tools = el("div", "tools");
       tools.appendChild(el("span", "ref", key));
@@ -506,6 +521,7 @@ body.has-player .wrap { padding-bottom: 150px; }
     last = { s: n, a: ayah };
     save("last", last);
     jump.value = ayah;
+    fillMeanings();
     markPlaying(false);
     if (ayah > 1) {
       var target = $("a" + ayah);
@@ -563,16 +579,64 @@ body.has-player .wrap { padding-bottom: 150px; }
     var t = $("a" + this.value);
     if (t) t.scrollIntoView({ block: "start" });
   });
-  var showTr = load("tr", true);
-  function setTr(on) {
-    showTr = !!on;
-    document.body.classList.toggle("no-tr", !showTr);
-    $("tr-toggle").setAttribute("aria-pressed", showTr ? "true" : "false");
-    $("tr-toggle").textContent = "Meaning: " + (showTr ? "On" : "Off");
-    save("tr", showTr);
+  /* ---------- meanings ---------- */
+  var LANG_NAMES = { en: "English", ml: "Malayalam", ta: "Tamil", hi: "Hindi" };
+  var lang = load("lang", load("tr", true) === false ? "off" : "en");
+  if (lang !== "off" && !LANG_NAMES[lang]) lang = "en";
+  function trData(code) {
+    if (code === "en") return window.QURAN_EN || null;
+    return (window.QURAN_TR && window.QURAN_TR[code]) || null;
   }
-  setTr(showTr);
-  $("tr-toggle").addEventListener("click", function () { setTr(!showTr); });
+  var loading = {};
+  function loadLang(code, done) {
+    if (trData(code)) { done(true); return; }
+    if (loading[code]) { loading[code].push(done); return; }
+    loading[code] = [done];
+    var sc = document.createElement("script");
+    sc.src = "quran-" + code + ".js";
+    var finish = function () {
+      var ok = !!trData(code), list = loading[code];
+      delete loading[code];
+      list.forEach(function (f) { f(ok); });
+    };
+    sc.onload = finish;
+    sc.onerror = function () { sc.remove(); finish(); };
+    document.head.appendChild(sc);
+  }
+  function langNote(text, bad) {
+    var e = $("lang-note");
+    e.textContent = text || "";
+    e.hidden = !text;
+    e.classList.toggle("bad", !!bad);
+  }
+  function clean(text) { return text.replace(/\s*\[\d+\]/g, ""); }   // drop footnote numbers; the notes are not included
+  function fillMeanings() {
+    if (!current) return;
+    var data = lang === "off" ? null : trData(lang);
+    var rows = document.querySelectorAll("#verses .ayah");
+    [].forEach.call(rows, function (row) {
+      var t = row.querySelector(".tr");
+      t.textContent = data ? clean(data[current - 1][+row.dataset.a - 1] || "") : "";
+      if (data) t.lang = lang;
+    });
+    var bis = document.querySelector("#verses .bismillah-tr");
+    if (bis) { bis.textContent = data ? clean(data[0][0]) : ""; if (data) bis.lang = lang; }
+  }
+  function setLang(code) {
+    lang = code;
+    save("lang", lang);
+    $("lang").value = lang;
+    if (lang === "off" || trData(lang)) { langNote(""); fillMeanings(); return; }
+    langNote("Loading " + LANG_NAMES[lang] + " meaning…");
+    fillMeanings();
+    loadLang(code, function (ok) {
+      if (lang !== code) return;
+      if (ok) { langNote(""); fillMeanings(); }
+      else langNote("Could not load the " + LANG_NAMES[code] + " meaning. Check your internet connection and choose it again.", true);
+    });
+  }
+  $("lang").addEventListener("change", function () { setLang(this.value); });
+  setLang(lang);
   $("smaller").addEventListener("click", function () { setSize(size - 2); });
   $("bigger").addEventListener("click", function () { setSize(size + 2); });
 
