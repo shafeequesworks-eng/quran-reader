@@ -185,7 +185,10 @@ body.has-player .wrap { padding-bottom: 150px; }
   flex: 1; min-width: 0; height: 40px; border-radius: 10px; border: 1px solid var(--line);
   background: var(--paper); padding: 0 8px; font-size: 14px;
 }
-.p-play { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); min-width: 72px; }
+.p-ic { display: grid; place-items: center; padding: 0; width: 44px; min-width: 44px; height: 44px; border-radius: 999px; }
+.p-play { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); width: 52px; min-width: 52px; height: 52px; }
+.p-play .i-pause, .p-play.is-playing .i-play { display: none; }
+.p-play.is-playing .i-pause { display: block; }
 .p-status { font-size: 13px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .p-status.bad { color: #b3261e; }
 .pager { display: flex; gap: 10px; padding: 24px 0 0; }
@@ -256,9 +259,16 @@ body.has-player .wrap { padding-bottom: 150px; }
 <div id="player" class="player" hidden>
   <div class="player-in">
     <div class="p-row">
-      <button id="p-prev" class="icon-btn" type="button" aria-label="Previous ayah">Prev</button>
-      <button id="p-play" class="icon-btn p-play" type="button">Play</button>
-      <button id="p-next" class="icon-btn" type="button" aria-label="Next ayah">Next</button>
+      <button id="p-prev" class="icon-btn p-ic" type="button" aria-label="Previous ayah" title="Previous ayah">
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path fill="currentColor" d="M6 5h2.4v14H6zM20 5v14L9.6 12z"/></svg>
+      </button>
+      <button id="p-play" class="icon-btn p-ic p-play" type="button" aria-label="Play" title="Play">
+        <svg class="i-play" viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><path fill="currentColor" d="M8 5v14l11-7z"/></svg>
+        <svg class="i-pause" viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><path fill="currentColor" d="M6.5 5h4v14h-4zM13.5 5h4v14h-4z"/></svg>
+      </button>
+      <button id="p-next" class="icon-btn p-ic" type="button" aria-label="Next ayah" title="Next ayah">
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path fill="currentColor" d="M15.6 5H18v14h-2.4zM4 5v14l10.4-7z"/></svg>
+      </button>
       <select id="reciter" aria-label="Reciter"></select>
     </div>
     <div id="p-status" class="p-status" role="status">Press Play to listen from the ayah you are reading.</div>
@@ -610,6 +620,12 @@ body.has-player .wrap { padding-bottom: 150px; }
     e.textContent = text;
     e.classList.toggle("bad", !!bad);
   }
+  function setPlaying(on) {
+    var b = $("p-play");
+    b.classList.toggle("is-playing", on);
+    b.setAttribute("aria-label", on ? "Pause" : "Play");
+    b.title = on ? "Pause" : "Play";
+  }
   function syncPlayer() {
     var visible = !!(current || track);
     $("player").hidden = !visible;
@@ -665,7 +681,7 @@ body.has-player .wrap { padding-bottom: 150px; }
     track.tried++;
     if (track.tried >= track.list.length) {
       status("Could not load this recitation. Check your internet connection or choose another reciter.", true);
-      $("p-play").textContent = "Play";
+      setPlaying(false);
       return;
     }
     track.i = (track.i + 1) % track.list.length;
@@ -675,18 +691,18 @@ body.has-player .wrap { padding-bottom: 150px; }
     var r = reciter();
     if (okIdx[r.id] !== track.i) { okIdx[r.id] = track.i; save("okidx", okIdx); }
     status(label() + " · " + r.name);
-    $("p-play").textContent = "Pause";
+    setPlaying(true);
     // warm up the next ayah from the source that just worked
     var s = track.s, a = track.bis ? 1 : track.a + 1;
     if (a <= Q[s - 1][4].length) warm.src = sources(r, s, a)[track.i];
   });
-  audio.addEventListener("pause", function () { $("p-play").textContent = "Play"; });
+  audio.addEventListener("pause", function () { setPlaying(false); });
   audio.addEventListener("ended", function () {
     if (!track) return;
     if (track.bis) { loadTrack(track.s, 1, false); return; }
     if (track.a < Q[track.s - 1][4].length) { loadTrack(track.s, track.a + 1, false); return; }
     status("End of " + Q[track.s - 1][1] + ".");
-    $("p-play").textContent = "Play";
+    setPlaying(false);
   });
   function toggle() {
     if (!track) { playFrom(current || (last ? last.s : 1), current ? (+$("jump").value || 1) : (last ? last.a : 1)); return; }
