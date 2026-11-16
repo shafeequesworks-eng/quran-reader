@@ -6,6 +6,7 @@ A personal, ad-free Quran reader with recitation audio.
 - Meaning under each ayah in English, Malayalam, Tamil or Hindi (can be switched off)
 - Recitation audio per ayah with a choice of reciters (needs internet)
 - Bookmarks, resume where you stopped, adjustable text size
+- Home page with continue reading and an ayah of the day, plus a tasbih counter
 - Installable on Android: open the site in Chrome and choose "Add to Home screen"
 
 Text: Noble Qur'an Encyclopedia (quranenc.com) via the quran-json project (CC BY 4.0).
