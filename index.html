@@ -1475,13 +1475,13 @@ body.has-nav .player { bottom: 64px; }
     { id: "alafasy", name: "Mishary Alafasy",
       cdn: ["128/ar.alafasy", "64/ar.alafasy"], ea: ["Alafasy_128kbps", "Alafasy_64kbps"] },
     { id: "abdulbasit", name: "Abdul Basit (Murattal)",
-      cdn: ["192/ar.abdulbasit", "192/ar.abdulbasitmurattal", "64/ar.abdulbasitmurattal"],
+      cdn: ["192/ar.abdulbasitmurattal", "64/ar.abdulbasitmurattal"],
       ea: ["Abdul_Basit_Murattal_192kbps", "Abdul_Basit_Murattal_64kbps"] },
     { id: "sudais", name: "Abdul Rahman Al-Sudais",
-      cdn: ["192/ar.sudais", "192/ar.abdurrahmaansudais", "64/ar.abdurrahmaansudais"],
+      cdn: ["192/ar.abdurrahmaansudais", "64/ar.abdurrahmaansudais"],
       ea: ["Abdurrahmaan_As-Sudais_192kbps", "Abdurrahmaan_As-Sudais_64kbps"] },
     { id: "shuraim", name: "Saud Al-Shuraim",
-      cdn: ["128/ar.shuraim", "64/ar.saoodshuraym"],
+      cdn: ["64/ar.saoodshuraym"],
       ea: ["Saood_ash-Shuraym_128kbps", "Saood_ash-Shuraym_64kbps"] },
     { id: "husary", name: "Mahmoud Al-Husary",
       cdn: ["128/ar.husary", "64/ar.husary"], ea: ["Husary_128kbps", "Husary_64kbps"] },
@@ -1498,7 +1498,7 @@ body.has-nav .player { bottom: 64px; }
   }
 
   var reciterId = load("reciter", "alafasy");
-  var okIdx = load("okidx", {});              // which source worked, per reciter
+  var okIdx = load("okidx2", {});              // which source worked, per reciter
   function reciter() {
     for (var i = 0; i < RECITERS.length; i++) if (RECITERS[i].id === reciterId) return RECITERS[i];
     return RECITERS[0];
@@ -1583,7 +1583,7 @@ body.has-nav .player { bottom: 64px; }
   });
   audio.addEventListener("playing", function () {
     var r = reciter();
-    if (okIdx[r.id] !== track.i) { okIdx[r.id] = track.i; save("okidx", okIdx); }
+    if (okIdx[r.id] !== track.i) { okIdx[r.id] = track.i; save("okidx2", okIdx); }
     status(label() + " · " + r.name);
     setPlaying(true);
     // warm up the next ayah from the source that just worked
