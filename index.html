@@ -161,6 +161,10 @@ button { cursor: pointer; }
   border: 1.5px solid var(--gold); border-radius: 999px; color: var(--gold);
   font-family: var(--font-ui); font-size: 0.45em; font-weight: 700; line-height: 1;
 }
+.ayah .tr { margin: 6px 0 2px; font-size: 15px; line-height: 1.6; color: var(--ink); text-align: left; max-width: 65ch; }
+.bismillah-tr { text-align: center; color: var(--muted); font-size: 14px; margin: 0 0 6px; }
+body.no-tr .tr, body.no-tr .bismillah-tr { display: none; }
+.surah-head .chip { margin-top: 12px; }
 .ayah .tools { display: flex; align-items: center; gap: 8px; margin-top: 4px; }
 .ayah .ref { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; margin-right: auto; }
 .chip {
@@ -220,7 +224,7 @@ body.has-player .wrap { padding-bottom: 150px; }
   </div>
   <ul id="list" class="list"></ul>
   <p id="empty" class="empty" hidden></p>
-  <p class="credit">Arabic text: Uthmani script from the Noble Qur'an Encyclopedia (quranenc.com), via the open quran-json project. Recitations stream from the Islamic Network CDN (alquran.cloud) and EveryAyah, and need an internet connection.</p>
+  <p class="credit">Arabic text: Uthmani script from the Noble Qur'an Encyclopedia (quranenc.com), via the open quran-json project. English meaning: Saheeh International translation, from the same source. Recitations stream from the Islamic Network CDN (alquran.cloud) and EveryAyah, and need an internet connection.</p>
 </main>
 
 <!-- Reader -->
@@ -238,6 +242,7 @@ body.has-player .wrap { padding-bottom: 150px; }
     <div class="surah-head">
       <div class="ar" id="r-ar" lang="ar" dir="rtl"></div>
       <p id="r-meta"></p>
+      <button id="tr-toggle" class="chip" type="button" aria-pressed="true">Meaning: On</button>
     </div>
     <div id="verses"></div>
     <div class="pager">
@@ -261,10 +266,11 @@ body.has-player .wrap { padding-bottom: 150px; }
 </div>
 
 <script src="quran-data.js"></script>
+<script src="quran-en.js"></script>
 <script>
 (function () {
   "use strict";
-  var Q = window.QURAN || [], JUZ = window.JUZ || [];
+  var Q = window.QURAN || [], JUZ = window.JUZ || [], EN = window.QURAN_EN || [];
   var $ = function (id) { return document.getElementById(id); };
 
   /* ---------- saved state (this browser only) ---------- */
@@ -422,6 +428,7 @@ body.has-player .wrap { padding-bottom: 150px; }
       var bis = el("p", "bismillah", Q[0][4][0]);
       bis.lang = "ar";
       box.appendChild(bis);
+      if (EN[0]) box.appendChild(el("p", "bismillah-tr", EN[0][0]));
     }
     if (observer) observer.disconnect();
     observer = ("IntersectionObserver" in window) ? new IntersectionObserver(function (entries) {
@@ -448,6 +455,7 @@ body.has-player .wrap { padding-bottom: 150px; }
       p.lang = "ar";
       p.appendChild(el("span", "n", arNum(a)));
       row.appendChild(p);
+      if (EN[n - 1] && EN[n - 1][idx]) row.appendChild(el("p", "tr", EN[n - 1][idx]));
 
       var tools = el("div", "tools");
       tools.appendChild(el("span", "ref", key));
@@ -545,6 +553,16 @@ body.has-player .wrap { padding-bottom: 150px; }
     var t = $("a" + this.value);
     if (t) t.scrollIntoView({ block: "start" });
   });
+  var showTr = load("tr", true);
+  function setTr(on) {
+    showTr = !!on;
+    document.body.classList.toggle("no-tr", !showTr);
+    $("tr-toggle").setAttribute("aria-pressed", showTr ? "true" : "false");
+    $("tr-toggle").textContent = "Meaning: " + (showTr ? "On" : "Off");
+    save("tr", showTr);
+  }
+  setTr(showTr);
+  $("tr-toggle").addEventListener("click", function () { setTr(!showTr); });
   $("smaller").addEventListener("click", function () { setSize(size - 2); });
   $("bigger").addEventListener("click", function () { setSize(size + 2); });
 

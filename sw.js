@@ -1,6 +1,6 @@
 /* Keeps the reader working offline. Recitation audio is streamed and never cached here. */
-var CACHE = "quran-reader-v1";
-var SHELL = ["./", "index.html", "quran-data.js", "amiri-quran.woff2", "manifest.webmanifest", "icon-192.png", "icon-512.png"];
+var CACHE = "quran-reader-v2";
+var SHELL = ["./", "index.html", "quran-data.js", "quran-en.js", "amiri-quran.woff2", "manifest.webmanifest", "icon-192.png", "icon-512.png"];
 self.addEventListener("install", function (e) {
   e.waitUntil(caches.open(CACHE).then(function (c) { return c.addAll(SHELL); }).then(function () { return self.skipWaiting(); }));
 });
