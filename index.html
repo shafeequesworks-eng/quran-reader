@@ -176,6 +176,53 @@ body.has-nav.has-player .wrap { padding-bottom: 220px; }
 .empty { color: var(--muted); padding: 28px 4px; font-size: 15px; }
 .credit { color: var(--muted); font-size: 12px; padding: 24px 0 0; }
 
+/* ---------- Prayer ---------- */
+.next { background: var(--hero); color: var(--hero-ink); border-radius: 18px; padding: 20px; display: grid; gap: 4px; }
+.next .eyebrow { color: var(--hero-gold); }
+.next b { font-size: 34px; font-weight: 600; line-height: 1.15; font-variant-numeric: tabular-nums; }
+.next span { font-size: 14px; opacity: 0.85; }
+.times { list-style: none; margin: 0; padding: 4px 16px; background: var(--surface); border: 1px solid var(--line); border-radius: 18px; }
+.times li { display: flex; justify-content: space-between; align-items: baseline; padding: 13px 0; border-bottom: 1px solid var(--line); font-size: 17px; }
+.times li:last-child { border-bottom: 0; }
+.times li span:last-child { font-variant-numeric: tabular-nums; font-weight: 600; }
+.times li.is-next { color: var(--gold); font-weight: 700; }
+.times li.minor { color: var(--muted); }
+.field { display: grid; gap: 6px; font-size: 13px; font-weight: 600; color: var(--muted); }
+.field select, .field input {
+  height: 44px; border-radius: 12px; border: 1px solid var(--line); background: var(--surface); padding: 0 12px;
+  font-size: 15px; font-weight: 500; color: var(--ink); width: 100%; min-width: 0;
+}
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.note { margin: 0; font-size: 14px; color: var(--muted); }
+.note.bad { color: var(--bad); }
+.manual summary { cursor: pointer; font-weight: 600; font-size: 14px; color: var(--accent); padding: 6px 0; }
+.manual .stack { padding-top: 8px; }
+
+/* ---------- Dhikr ---------- */
+.backlink { display: inline-flex; align-items: center; gap: 6px; background: none; border: 0; padding: 16px 0 0; color: var(--muted); font-weight: 600; font-size: 14px; }
+.backlink svg { width: 16px; height: 16px; }
+.backlink + .page-head { padding-top: 6px; }
+.group-title { margin: 22px 0 8px; }
+.chapters { list-style: none; margin: 0; padding: 0 16px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; }
+.chapters button { display: flex; justify-content: space-between; align-items: center; gap: 12px; width: 100%; text-align: left; background: none; border: 0; border-bottom: 1px solid var(--line); padding: 13px 0; font-size: 15px; }
+.chapters li:last-child button { border-bottom: 0; }
+.chapters small { color: var(--muted); font-variant-numeric: tabular-nums; flex: none; }
+.dua { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 18px; display: grid; gap: 10px; }
+.dua .ar { font-family: var(--font-ar); font-size: 24px; line-height: 2.1; direction: rtl; text-align: right; margin: 0; white-space: pre-line; }
+.dua .tl { margin: 0; font-size: 14px; font-style: italic; color: var(--muted); white-space: pre-line; }
+.dua .en { margin: 0; font-family: var(--font-read); font-size: 18px; line-height: 1.5; white-space: pre-line; }
+.dua .side { margin: 0; font-size: 14px; color: var(--muted); white-space: pre-line; }
+.dua .foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.dua .ref { font-size: 12px; color: var(--muted); }
+.rep { flex: none; min-height: 40px; border-radius: 999px; border: 1.5px solid var(--gold); background: none; color: var(--gold); padding: 0 16px; font-weight: 700; font-size: 14px; font-variant-numeric: tabular-nums; }
+.rep.done { background: var(--gold); color: var(--gold-ink); }
+.names { list-style: none; margin: 0; padding: 0; }
+.names li { display: grid; grid-template-columns: 36px 1fr auto; align-items: center; gap: 12px; padding: 12px 2px; border-bottom: 1px solid var(--line); }
+.names .k { color: var(--gold); font-weight: 700; font-size: 13px; font-variant-numeric: tabular-nums; }
+.names b { display: block; font-weight: 600; }
+.names small { display: block; color: var(--muted); font-size: 13px; }
+.names .ar { font-family: var(--font-ar); font-size: 26px; line-height: 1.7; }
+
 /* ---------- Tasbih ---------- */
 .tasbih { display: grid; justify-items: center; gap: 18px; padding-top: 8px; }
 .count-btn {
@@ -302,6 +349,11 @@ body.has-nav .player { bottom: 64px; }
     </section>
 
     <ul class="links">
+      <li><button id="go-prayer" class="link" type="button">
+        <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 7.5V12l3 2"/></svg></span>
+        <span><b id="home-prayer-title">Prayer times</b><small id="home-prayer-sub">Set your location to see today's times</small></span>
+        <span class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></span>
+      </button></li>
       <li><button id="go-saved" class="link" type="button">
         <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M7 4h10a1 1 0 0 1 1 1v15l-6-4-6 4V5a1 1 0 0 1 1-1z"/></svg></span>
         <span><b>Bookmarks</b><small id="saved-count">No ayahs saved yet</small></span>
@@ -314,7 +366,7 @@ body.has-nav .player { bottom: 64px; }
       </button></li>
     </ul>
   </div>
-  <p class="credit">Arabic text: Uthmani script from the Noble Qur'an Encyclopedia (quranenc.com), via the open quran-json project. Meanings: English (Saheeh International), Malayalam (Abdul Hameed Madani and Kunhi Mohammed), Tamil (Abdulhameed Baqavi), Hindi (Maulana Azizul Haque Al Umari), as published by QuranEnc.com and the King Fahd Quran Complex. Recitations stream from the Islamic Network CDN (alquran.cloud) and EveryAyah, and need an internet connection. The Hijri date is calculated and can differ by a day from your local moon sighting.</p>
+  <p class="credit">Arabic text: Uthmani script from the Noble Qur'an Encyclopedia (quranenc.com), via the open quran-json project. Meanings: English (Saheeh International), Malayalam (Abdul Hameed Madani and Kunhi Mohammed), Tamil (Abdulhameed Baqavi), Hindi (Maulana Azizul Haque Al Umari), as published by QuranEnc.com and the King Fahd Quran Complex. Recitations stream from the Islamic Network CDN (alquran.cloud) and EveryAyah, and need an internet connection. Prayer times are calculated on this phone with the adhan-js library. Adhkar (Hisn al-Muslim) and the 99 Names come from the muslim-data project by Kosrat D. Ahmad. The Hijri date is calculated and can differ by a day from your local moon sighting.</p>
 </main>
 
 <!-- Quran -->
@@ -332,8 +384,64 @@ body.has-nav .player { bottom: 64px; }
   <p id="empty" class="empty" hidden></p>
 </main>
 
+<!-- Prayer -->
+<main id="prayer" class="wrap page" hidden>
+  <div class="page-head"><h1>Prayer times</h1><p id="pt-date"></p></div>
+  <div class="stack">
+    <div id="pt-setup" class="card stack">
+      <p class="note" id="pt-setup-text">Prayer times are calculated on this phone from your location. Your location is not sent anywhere.</p>
+      <button id="pt-locate" class="pill solid" type="button" style="justify-self:start">Use my location</button>
+    </div>
+    <div id="pt-main" class="stack" hidden>
+      <div class="next"><span class="eyebrow">Next prayer</span><b id="pt-next"></b><span id="pt-in"></span></div>
+      <ul id="pt-list" class="times"></ul>
+      <p class="note" id="pt-where"></p>
+      <button id="pt-relocate" class="pill" type="button" style="justify-self:start">Update my location</button>
+    </div>
+    <p id="pt-note" class="note" role="status" hidden></p>
+    <div class="two">
+      <label class="field" for="pt-method">Calculation method<select id="pt-method"></select></label>
+      <label class="field" for="pt-asr">Asr time<select id="pt-asr"><option value="standard">Standard (Shafi, Maliki, Hanbali)</option><option value="hanafi">Hanafi</option></select></label>
+    </div>
+    <p class="note" id="pt-method-note"></p>
+    <details class="manual">
+      <summary>Enter coordinates yourself</summary>
+      <div class="stack">
+        <div class="two">
+          <label class="field" for="pt-lat">Latitude<input id="pt-lat" type="number" inputmode="decimal" step="any" min="-90" max="90" placeholder="12.97"></label>
+          <label class="field" for="pt-lng">Longitude<input id="pt-lng" type="number" inputmode="decimal" step="any" min="-180" max="180" placeholder="77.59"></label>
+        </div>
+        <button id="pt-save" class="pill" type="button" style="justify-self:start">Use these coordinates</button>
+      </div>
+    </details>
+  </div>
+</main>
+
+<!-- Dhikr -->
+<main id="dhikr" class="wrap page" hidden>
+  <div class="page-head"><h1>Dhikr</h1><p>Daily remembrance and duas</p></div>
+  <ul class="links" id="dhikr-top"></ul>
+  <p id="dhikr-note" class="note" role="status" style="padding-top:16px" hidden></p>
+  <div id="dhikr-cats"></div>
+</main>
+
+<!-- One chapter of duas -->
+<main id="dua" class="wrap page" hidden>
+  <button class="backlink" type="button" data-go="dhikr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>Dhikr</button>
+  <div class="page-head"><h1 id="dua-title"></h1><p id="dua-sub"></p></div>
+  <div id="dua-list" class="stack"></div>
+</main>
+
+<!-- 99 Names -->
+<main id="names" class="wrap page" hidden>
+  <button class="backlink" type="button" data-go="dhikr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>Dhikr</button>
+  <div class="page-head"><h1>The 99 Names of Allah</h1><p>Asma ul Husna</p></div>
+  <ul id="names-list" class="names"></ul>
+</main>
+
 <!-- Tasbih -->
 <main id="tasbih" class="wrap page" hidden>
+  <button class="backlink" type="button" data-go="dhikr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>Dhikr</button>
   <div class="page-head"><h1>Tasbih</h1><p>Tap the circle to count</p></div>
   <div class="tasbih">
     <button id="count" class="count-btn" type="button" aria-label="Count one"><b id="count-n">0</b><span id="count-of">of 33</span></button>
@@ -412,10 +520,12 @@ body.has-nav .player { bottom: 64px; }
   <div class="nav-in">
     <button type="button" data-page="home" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11l8-7 8 7v8a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1z"/></svg><span>Home</span></button>
     <button type="button" data-page="quran"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5C6.5 4.5 9.5 4.7 12 6c2.5-1.3 5.5-1.5 8-.5v13c-2.5-1-5.5-.8-8 .5-2.5-1.3-5.5-1.5-8-.5zM12 6v13"/></svg><span>Quran</span></button>
-    <button type="button" data-page="tasbih"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 8.500v7M8.5 12h7"/></svg><span>Tasbih</span></button>
+    <button type="button" data-page="prayer"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 7.5V12l3 2"/></svg><span>Prayer</span></button>
+    <button type="button" data-page="dhikr"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.4-7-9.6A4.4 4.4 0 0 1 12 7.6a4.4 4.4 0 0 1 7 2.8C19 15.6 12 20 12 20z"/></svg><span>Dhikr</span></button>
   </div>
 </nav>
 
+<script src="adhan.min.js"></script>
 <script src="quran-data.js"></script>
 <script>
 (function () {
@@ -437,7 +547,7 @@ body.has-nav .player { bottom: 64px; }
   var marks = load("marks", []);            // ["2:255", ...]
   var size = load("size", 30);
   var tab = "surahs";
-  var page = "home";                         // home | quran | tasbih
+  var page = "home", pageArg = 0;            // which screen is open (and which dua chapter)
   var current = 0;                           // open surah number, 0 = not in the reader
 
   function setSize(px) {
@@ -517,6 +627,7 @@ body.has-nav .player { bottom: 64px; }
     $("aotd-ar").textContent = Q[t.s - 1][4][t.a - 1];
     fillAotd();
 
+    homePrayer();
     $("saved-count").textContent = marks.length ? marks.length + (marks.length === 1 ? " ayah saved" : " ayahs saved") : "No ayahs saved yet";
     tasbihSummary();
   }
@@ -525,6 +636,7 @@ body.has-nav .player { bottom: 64px; }
   $("aotd-play").addEventListener("click", function () { var t = todaysAyah(); loadTrack(t.s, t.a, false, true); });
   $("go-saved").addEventListener("click", function () { setTab("saved"); go("quran"); });
   $("go-tasbih").addEventListener("click", function () { go("tasbih"); });
+  $("go-prayer").addEventListener("click", function () { go("prayer"); });
 
   /* ---------- quran lists ---------- */
   function rowButton(num, name, meta, ar, onClick) {
@@ -624,6 +736,287 @@ body.has-nav .player { bottom: 64px; }
   });
   $("target").addEventListener("change", function () { tb.target = +this.value; tb.n = 0; save("tasbih", tb); renderTasbih(); });
   $("count-reset").addEventListener("click", function () { tb.n = 0; tb.today = 0; tb.rounds = 0; save("tasbih", tb); renderTasbih("Counter reset."); });
+
+  /* ---------- prayer times (calculated on the device) ---------- */
+  var PT_METHODS = [
+    ["auto", "Automatic for my region"],
+    ["Karachi", "University of Islamic Sciences, Karachi"],
+    ["MuslimWorldLeague", "Muslim World League"],
+    ["UmmAlQura", "Umm al-Qura, Makkah"],
+    ["Egyptian", "Egyptian General Authority"],
+    ["Dubai", "Dubai"], ["Kuwait", "Kuwait"], ["Qatar", "Qatar"],
+    ["Singapore", "Singapore, Malaysia, Indonesia"],
+    ["Turkey", "Turkey (Diyanet)"], ["Tehran", "Tehran"],
+    ["NorthAmerica", "North America (ISNA)"],
+    ["MoonsightingCommittee", "Moonsighting Committee"]
+  ];
+  function methodName(id) {
+    for (var i = 0; i < PT_METHODS.length; i++) if (PT_METHODS[i][0] === id) return PT_METHODS[i][1];
+    return id;
+  }
+  function autoMethod() {
+    var tz = "";
+    try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ""; } catch (e) {}
+    if (/^Asia\/(Kolkata|Calcutta|Karachi|Dhaka|Kabul|Kathmandu|Katmandu|Colombo|Thimphu)$/.test(tz)) return "Karachi";
+    if (/^Asia\/(Riyadh|Aden)$/.test(tz)) return "UmmAlQura";
+    if (/^Asia\/(Dubai|Muscat)$/.test(tz)) return "Dubai";
+    if (tz === "Asia/Kuwait") return "Kuwait";
+    if (/^Asia\/(Qatar|Bahrain)$/.test(tz)) return "Qatar";
+    if (/^Asia\/(Singapore|Kuala_Lumpur|Kuching|Jakarta|Pontianak|Makassar|Jayapura|Brunei)$/.test(tz)) return "Singapore";
+    if (tz === "Europe/Istanbul") return "Turkey";
+    if (tz === "Asia/Tehran") return "Tehran";
+    if (tz === "Africa/Cairo") return "Egyptian";
+    if (/^America\//.test(tz)) return "NorthAmerica";
+    return "MuslimWorldLeague";
+  }
+  var pt = load("prayer", { lat: null, lng: null, method: "auto", asr: "standard" });
+  var A = window.adhan;
+  function ptCompute(date) {
+    if (pt.lat == null || !A) return null;
+    var m = pt.method === "auto" ? autoMethod() : pt.method;
+    if (!A.CalculationMethod[m]) m = "MuslimWorldLeague";
+    var params = A.CalculationMethod[m]();
+    params.madhab = pt.asr === "hanafi" ? A.Madhab.Hanafi : A.Madhab.Shafi;
+    var t = new A.PrayerTimes(new A.Coordinates(pt.lat, pt.lng), date, params);
+    return { method: m, list: [["Fajr", t.fajr], ["Sunrise", t.sunrise], ["Dhuhr", t.dhuhr], ["Asr", t.asr], ["Maghrib", t.maghrib], ["Isha", t.isha]] };
+  }
+  function ok(d) { return d instanceof Date && !isNaN(d.getTime()); }
+  function ptNext() {
+    var now = new Date(), r = ptCompute(now);
+    if (!r) return null;
+    for (var i = 0; i < r.list.length; i++) {
+      if (r.list[i][0] !== "Sunrise" && ok(r.list[i][1]) && r.list[i][1] > now) return { name: r.list[i][0], time: r.list[i][1], today: r };
+    }
+    var t2 = ptCompute(new Date(now.getTime() + 86400000));
+    if (t2 && ok(t2.list[0][1])) return { name: "Fajr", time: t2.list[0][1], today: r };
+    return { name: "", time: null, today: r };
+  }
+  function clock(d) {
+    if (!ok(d)) return "—";
+    try { return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }); } catch (e) { return d.toTimeString().slice(0, 5); }
+  }
+  function fromNow(d) {
+    var mins = Math.max(0, Math.round((d.getTime() - Date.now()) / 60000));
+    var h = Math.floor(mins / 60), m = mins % 60;
+    return "in " + (h ? h + "h " : "") + m + "m";
+  }
+  function coordText() {
+    return Math.abs(pt.lat).toFixed(2) + "° " + (pt.lat >= 0 ? "N" : "S") + ", " + Math.abs(pt.lng).toFixed(2) + "° " + (pt.lng >= 0 ? "E" : "W");
+  }
+  function ptNote(text, bad) {
+    var e = $("pt-note");
+    e.textContent = text || "";
+    e.hidden = !text;
+    e.classList.toggle("bad", !!bad);
+  }
+  function homePrayer() {
+    var nx = ptNext();
+    if (nx && nx.time) {
+      $("home-prayer-title").textContent = "Next prayer: " + nx.name + " " + clock(nx.time);
+      $("home-prayer-sub").textContent = fromNow(nx.time) + " · see all of today's times";
+    } else {
+      $("home-prayer-title").textContent = "Prayer times";
+      $("home-prayer-sub").textContent = "Set your location to see today's times";
+    }
+  }
+  function renderPrayer() {
+    var d = new Date();
+    try { $("pt-date").textContent = d.toLocaleDateString(undefined, { weekday: "long", day: "numeric", month: "long" }); } catch (e) { $("pt-date").textContent = d.toDateString(); }
+    $("pt-method").value = pt.method;
+    $("pt-asr").value = pt.asr;
+    if (!A) {
+      $("pt-setup-text").textContent = "The prayer time calculator did not load. Reload the page to try again.";
+      $("pt-locate").hidden = true;
+      return;
+    }
+    var nx = ptNext();
+    $("pt-setup").hidden = !!nx;
+    $("pt-main").hidden = !nx;
+    $("pt-method-note").textContent = pt.method === "auto"
+      ? "Automatic uses the method common in your region, taken from this phone's time zone: " + methodName(autoMethod()) + ". Mosques can differ by a few minutes; choose another method if yours does."
+      : "Mosques can differ by a few minutes; choose the method your local mosque follows.";
+    if (!nx) return;
+    $("pt-next").textContent = nx.time ? nx.name + " " + clock(nx.time) : "No time available";
+    $("pt-in").textContent = nx.time ? fromNow(nx.time) : "Prayer times cannot be calculated for this place today.";
+    var list = $("pt-list");
+    list.textContent = "";
+    nx.today.list.forEach(function (row) {
+      var li = el("li");
+      li.appendChild(el("span", null, row[0]));
+      li.appendChild(el("span", null, clock(row[1])));
+      if (row[0] === "Sunrise") li.className = "minor";
+      if (nx.time && row[0] === nx.name && row[1].getTime() === nx.time.getTime()) li.className = "is-next";
+      list.appendChild(li);
+    });
+    $("pt-where").textContent = "For " + coordText() + " · " + methodName(nx.today.method) + " · times in this phone's time zone";
+  }
+  function setPlace(lat, lng) {
+    pt.lat = Math.round(lat * 10000) / 10000;
+    pt.lng = Math.round(lng * 10000) / 10000;
+    save("prayer", pt);
+    ptNote("");
+    renderPrayer();
+  }
+  function locate() {
+    if (!navigator.geolocation) { ptNote("This browser cannot share its location. Enter your coordinates below.", true); return; }
+    ptNote("Finding your location…");
+    navigator.geolocation.getCurrentPosition(function (pos) {
+      setPlace(pos.coords.latitude, pos.coords.longitude);
+    }, function (err) {
+      ptNote(err && err.code === 1
+        ? "Location permission is off for this app. Allow location in your browser's site settings and try again, or enter your coordinates below."
+        : "Could not find your location. Check that location is switched on and try again, or enter your coordinates below.", true);
+    }, { enableHighAccuracy: false, timeout: 15000, maximumAge: 600000 });
+  }
+  PT_METHODS.forEach(function (m) { var o = el("option", null, m[1]); o.value = m[0]; $("pt-method").appendChild(o); });
+  $("pt-locate").addEventListener("click", locate);
+  $("pt-relocate").addEventListener("click", locate);
+  $("pt-method").addEventListener("change", function () { pt.method = this.value; save("prayer", pt); renderPrayer(); });
+  $("pt-asr").addEventListener("change", function () { pt.asr = this.value; save("prayer", pt); renderPrayer(); });
+  $("pt-save").addEventListener("click", function () {
+    var la = parseFloat($("pt-lat").value), lo = parseFloat($("pt-lng").value);
+    if (isNaN(la) || isNaN(lo) || la < -90 || la > 90 || lo < -180 || lo > 180) {
+      ptNote("Enter a latitude between -90 and 90 and a longitude between -180 and 180.", true);
+      return;
+    }
+    setPlace(la, lo);
+  });
+  setInterval(function () {
+    if (current) return;
+    if (page === "prayer") renderPrayer(); else if (page === "home") homePrayer();
+  }, 30000);
+
+  /* ---------- dhikr: adhkar, duas, 99 Names ---------- */
+  var CHEV = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>';
+  var dhikrWait = null;
+  function withDhikr(done) {
+    if (window.DHIKR) { done(true); return; }
+    if (dhikrWait) { dhikrWait.push(done); return; }
+    dhikrWait = [done];
+    var sc = document.createElement("script");
+    sc.src = "dhikr-data.js";
+    var finish = function () { var l = dhikrWait; dhikrWait = null; l.forEach(function (f) { f(!!window.DHIKR); }); };
+    sc.onload = finish;
+    sc.onerror = function () { sc.remove(); finish(); };
+    document.head.appendChild(sc);
+  }
+  function dhikrNote(text, bad) {
+    var e = $("dhikr-note");
+    e.textContent = text || "";
+    e.hidden = !text;
+    e.classList.toggle("bad", !!bad);
+  }
+  function linkRow(title, sub, onClick) {
+    var li = el("li"), b = el("button", "link");
+    b.type = "button";
+    var ic = el("span", "ic"); ic.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.4-7-9.6A4.4 4.4 0 0 1 12 7.6a4.4 4.4 0 0 1 7 2.8C19 15.6 12 20 12 20z"/></svg>';
+    var mid = el("span"); mid.appendChild(el("b", null, title)); mid.appendChild(el("small", null, sub));
+    var ch = el("span", "chev"); ch.innerHTML = CHEV;
+    b.appendChild(ic); b.appendChild(mid); b.appendChild(ch);
+    b.addEventListener("click", onClick);
+    li.appendChild(b);
+    return li;
+  }
+  function chapterOf(id) {
+    var D = window.DHIKR, found = null;
+    if (!D) return null;
+    D.cats.forEach(function (c) { c[1].forEach(function (ch) { if (ch[0] === id) found = ch; }); });
+    return found;
+  }
+  function renderDhikr() {
+    var top = $("dhikr-top"), cats = $("dhikr-cats");
+    top.textContent = ""; cats.textContent = "";
+    dhikrNote("Loading…");
+    withDhikr(function (okay) {
+      if (page !== "dhikr" || current) return;
+      top.textContent = ""; cats.textContent = "";
+      top.appendChild(linkRow("Tasbih counter", "Count in rounds of 33, 34, 99 or 100", function () { go("tasbih"); }));
+      if (!okay) { dhikrNote("Could not load the adhkar. Check your internet connection and open this page again.", true); return; }
+      dhikrNote("");
+      var D = window.DHIKR, evening = new Date().getHours() >= 15;
+      var m = chapterOf(D.morning), e = chapterOf(D.evening);
+      var rows = [
+        linkRow("Morning adhkar", m[2].length + " remembrances" + (evening ? "" : " · for this time of day"), function () { go("dua", D.morning); }),
+        linkRow("Evening adhkar", e[2].length + " remembrances" + (evening ? " · for this time of day" : ""), function () { go("dua", D.evening); })
+      ];
+      if (evening) rows.reverse();
+      top.insertBefore(rows[1], top.firstChild);
+      top.insertBefore(rows[0], top.firstChild);
+      top.appendChild(linkRow("The 99 Names of Allah", "Asma ul Husna with meanings", function () { go("names"); }));
+      D.cats.forEach(function (c) {
+        cats.appendChild(el("p", "eyebrow group-title", c[0]));
+        var ul = el("ul", "chapters");
+        c[1].forEach(function (ch) {
+          var li = el("li"), b = el("button");
+          b.type = "button";
+          b.appendChild(el("span", null, ch[1]));
+          b.appendChild(el("small", null, String(ch[2].length)));
+          b.addEventListener("click", function () { go("dua", ch[0]); });
+          li.appendChild(b); ul.appendChild(li);
+        });
+        cats.appendChild(ul);
+      });
+    });
+  }
+  function renderDua(id) {
+    var box = $("dua-list");
+    box.textContent = "";
+    $("dua-title").textContent = "Loading…";
+    $("dua-sub").textContent = "";
+    withDhikr(function (okay) {
+      if (page !== "dua" || pageArg !== id || current) return;
+      var ch = okay ? chapterOf(id) : null;
+      if (!ch) {
+        $("dua-title").textContent = okay ? "Not found" : "Could not load";
+        $("dua-sub").textContent = okay ? "This chapter does not exist. Go back to Dhikr and choose another." : "Check your internet connection and open this page again.";
+        return;
+      }
+      $("dua-title").textContent = ch[1];
+      $("dua-sub").textContent = ch[2].length + (ch[2].length === 1 ? " entry" : " entries") + " · from Hisn al-Muslim";
+      ch[2].forEach(function (it) {
+        var card = el("div", "dua");
+        if (it[3]) card.appendChild(el("p", "side", it[3]));
+        if (it[0]) { var ar = el("p", "ar", it[0]); ar.lang = "ar"; card.appendChild(ar); }
+        if (it[1]) card.appendChild(el("p", "tl", it[1]));
+        if (it[4]) card.appendChild(el("p", "en", it[4]));
+        if (it[5]) card.appendChild(el("p", "side", it[5]));
+        var foot = el("div", "foot");
+        foot.appendChild(el("span", "ref", it[6]));
+        if (it[2] > 1) {
+          var done = 0, rb = el("button", "rep", "0 / " + it[2]);
+          rb.type = "button";
+          rb.setAttribute("aria-label", "Repeat " + it[2] + " times. Tap to count.");
+          rb.addEventListener("click", function () {
+            done = done >= it[2] ? 0 : done + 1;
+            rb.textContent = done + " / " + it[2];
+            rb.classList.toggle("done", done >= it[2]);
+            if (done >= it[2]) { try { if (navigator.vibrate) navigator.vibrate(80); } catch (e) {} }
+          });
+          foot.appendChild(rb);
+        }
+        if (it[6] || it[2] > 1) card.appendChild(foot);
+        box.appendChild(card);
+      });
+    });
+  }
+  function renderNames() {
+    var list = $("names-list");
+    list.textContent = "";
+    withDhikr(function (okay) {
+      if (page !== "names" || current) return;
+      list.textContent = "";
+      if (!okay) { list.appendChild(el("li", null, "Could not load the names. Check your internet connection and open this page again.")); return; }
+      window.DHIKR.names.forEach(function (n, i) {
+        var li = el("li");
+        li.appendChild(el("span", "k", String(i + 1)));
+        var mid = el("span"); mid.appendChild(el("b", null, n[1])); mid.appendChild(el("small", null, n[2]));
+        li.appendChild(mid);
+        var ar = el("span", "ar", n[0]); ar.lang = "ar"; ar.dir = "rtl";
+        li.appendChild(ar);
+        list.appendChild(li);
+      });
+    });
+  }
 
   /* ---------- reader ---------- */
   var observer = null;
@@ -748,27 +1141,36 @@ body.has-nav .player { bottom: 64px; }
   }
 
   /* ---------- moving between screens ---------- */
-  var PAGES = ["home", "quran", "tasbih"];
+  var VIEWS = ["home", "quran", "prayer", "dhikr", "dua", "names", "tasbih"];
+  var NAV_OF = { dua: "dhikr", names: "dhikr", tasbih: "dhikr" };
   var pendingAyah = 1, shown = false;
-  function showPage(p) {
+  function showPage(p, arg) {
     page = p;
+    pageArg = arg || 0;
     current = 0;
     shown = true;
     if (observer) observer.disconnect();
     $("reader").hidden = true;
-    PAGES.forEach(function (id) { $(id).hidden = id !== p; });
+    VIEWS.forEach(function (id) { $(id).hidden = id !== p; });
     $("nav").hidden = false;
     document.body.classList.add("has-nav");
+    var tabName = NAV_OF[p] || p;
     [].forEach.call(document.querySelectorAll(".nav button"), function (b) {
-      if (b.dataset.page === p) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current");
+      if (b.dataset.page === tabName) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current");
     });
-    if (p === "home") renderHome(); else if (p === "quran") renderQuran(); else renderTasbih();
+    if (p === "home") renderHome();
+    else if (p === "quran") renderQuran();
+    else if (p === "prayer") renderPrayer();
+    else if (p === "dhikr") renderDhikr();
+    else if (p === "dua") renderDua(pageArg);
+    else if (p === "names") renderNames();
+    else renderTasbih();
     window.scrollTo(0, 0);
     syncPlayer();
   }
   function showSurah(n, ayah) {
     shown = true;
-    PAGES.forEach(function (id) { $(id).hidden = true; });
+    VIEWS.forEach(function (id) { $(id).hidden = true; });
     $("nav").hidden = true;
     document.body.classList.remove("has-nav");
     $("reader").hidden = false;
@@ -782,10 +1184,11 @@ body.has-nav .player { bottom: 64px; }
     try { location.hash = h; } catch (e) {}
     setTimeout(function () { if (current !== n) showSurah(n, pendingAyah); }, 60);
   }
-  function go(p) {
-    var h = p === "home" ? "" : "#" + p;
+  function go(p, arg) {
+    arg = arg || 0;
+    var h = p === "home" ? "" : p === "dua" ? "#dua-" + arg : "#" + p;
     try { if ((location.hash || "") !== h) location.hash = h; } catch (e) {}
-    setTimeout(function () { if (current !== 0 || page !== p) showPage(p); }, 60);
+    setTimeout(function () { if (current !== 0 || page !== p || pageArg !== arg) showPage(p, arg); }, 60);
   }
   function route() {
     var h = location.hash || "";
@@ -795,8 +1198,10 @@ body.has-nav .player { bottom: 64px; }
     if (n) {
       if (current !== n) showSurah(n, pendingAyah);
     } else {
-      var p = h === "#quran" ? "quran" : h === "#tasbih" ? "tasbih" : "home";
-      if (!shown || current !== 0 || page !== p) showPage(p);
+      var d = /^#dua-(\d{1,3})$/.exec(h), p = "home", arg = 0;
+      if (d) { p = "dua"; arg = +d[1]; }
+      else if (h.length > 1 && h.slice(1) !== "dua" && VIEWS.indexOf(h.slice(1)) >= 0) p = h.slice(1);
+      if (!shown || current !== 0 || page !== p || pageArg !== arg) showPage(p, arg);
     }
     pendingAyah = 1;
   }
@@ -804,7 +1209,10 @@ body.has-nav .player { bottom: 64px; }
   [].forEach.call(document.querySelectorAll(".nav button"), function (b) {
     b.addEventListener("click", function () { go(b.dataset.page); });
   });
-  $("back").addEventListener("click", function () { go(page); });
+  [].forEach.call(document.querySelectorAll(".backlink"), function (b) {
+    b.addEventListener("click", function () { go(b.dataset.go); });
+  });
+  $("back").addEventListener("click", function () { go(page, pageArg); });
   $("prev").addEventListener("click", function () { if (current > 1) open(current - 1, 1); });
   $("next").addEventListener("click", function () { if (current < 114) open(current + 1, 1); });
   $("jump").addEventListener("change", function () {
