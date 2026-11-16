@@ -1,5 +1,5 @@
 /* Keeps the reader working offline. Recitation audio is streamed and never cached here. */
-var CACHE = "quran-reader-v6";
+var CACHE = "quran-reader-v7";
 var SHELL = ["./", "index.html", "quran-data.js", "adhan.min.js", "quran-en.js", "amiri-quran.woff2", "manifest.webmanifest", "icon-192.png", "icon-512.png"];
 self.addEventListener("install", function (e) {
   e.waitUntil(caches.open(CACHE).then(function (c) { return c.addAll(SHELL); }).then(function () { return self.skipWaiting(); }));
@@ -12,6 +12,8 @@ self.addEventListener("activate", function (e) {
 self.addEventListener("fetch", function (e) {
   var url = new URL(e.request.url);
   if (e.request.method !== "GET" || url.origin !== self.location.origin) return;
+  // Audio is fetched in ranges and the azan list must be fresh: leave both to the network.
+  if (e.request.headers.has("range") || /\/azan\/list\.json$/.test(url.pathname)) return;
   e.respondWith(caches.open(CACHE).then(function (c) {
     return c.match(e.request, { ignoreSearch: true }).then(function (hit) {
       var fresh = fetch(e.request).then(function (res) {

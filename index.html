@@ -198,6 +198,13 @@ body.has-nav.has-player .wrap { padding-bottom: 220px; }
 .manual summary { cursor: pointer; font-weight: 600; font-size: 14px; color: var(--accent); padding: 6px 0; }
 .manual .stack { padding-top: 8px; }
 
+.az-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.check { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 15px; }
+.check input { width: 22px; height: 22px; accent-color: var(--gold); flex: none; }
+.week { list-style: none; margin: 8px 0 0; padding: 0; }
+.week li { display: flex; justify-content: space-between; gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--line); font-size: 14px; font-variant-numeric: tabular-nums; }
+.week li span:last-child { color: var(--muted); }
+
 /* ---------- Dhikr ---------- */
 .backlink { display: inline-flex; align-items: center; gap: 6px; background: none; border: 0; padding: 16px 0 0; color: var(--muted); font-weight: 600; font-size: 14px; }
 .backlink svg { width: 16px; height: 16px; }
@@ -404,6 +411,23 @@ body.has-nav .player { bottom: 64px; }
       <label class="field" for="pt-asr">Asr time<select id="pt-asr"><option value="standard">Standard (Shafi, Maliki, Hanbali)</option><option value="hanafi">Hanafi</option></select></label>
     </div>
     <p class="note" id="pt-method-note"></p>
+    <details class="manual" id="pt-week-box" hidden>
+      <summary>Sunrise and sunset for the next 7 days</summary>
+      <ul id="pt-week" class="week"></ul>
+    </details>
+    <section class="card stack" aria-labelledby="az-label">
+      <div class="card-top"><span class="eyebrow" id="az-label">Azan</span><span id="az-time"></span></div>
+      <label class="field" for="az-pick">Recording<select id="az-pick"></select></label>
+      <div class="az-row">
+        <button id="az-play" class="pill solid" type="button">Play</button>
+        <button id="az-stop" class="pill" type="button">Stop</button>
+        <button id="az-add" class="pill" type="button">Add from this phone</button>
+        <button id="az-remove" class="pill" type="button" hidden>Remove</button>
+        <input id="az-file" type="file" accept="audio/*" hidden>
+      </div>
+      <label class="check" for="az-auto"><input type="checkbox" id="az-auto">Play the azan at each prayer time</label>
+      <p class="note" id="az-note" role="status"></p>
+    </section>
     <details class="manual">
       <summary>Enter coordinates yourself</summary>
       <div class="stack">
@@ -778,14 +802,14 @@ body.has-nav .player { bottom: 64px; }
     var params = A.CalculationMethod[m]();
     params.madhab = pt.asr === "hanafi" ? A.Madhab.Hanafi : A.Madhab.Shafi;
     var t = new A.PrayerTimes(new A.Coordinates(pt.lat, pt.lng), date, params);
-    return { method: m, list: [["Fajr", t.fajr], ["Sunrise", t.sunrise], ["Dhuhr", t.dhuhr], ["Asr", t.asr], ["Maghrib", t.maghrib], ["Isha", t.isha]] };
+    return { method: m, list: [["Fajr", t.fajr], ["Sunrise", t.sunrise], ["Dhuhr", t.dhuhr], ["Asr", t.asr], ["Sunset", t.sunset], ["Maghrib", t.maghrib], ["Isha", t.isha]] };
   }
   function ok(d) { return d instanceof Date && !isNaN(d.getTime()); }
   function ptNext() {
     var now = new Date(), r = ptCompute(now);
     if (!r) return null;
     for (var i = 0; i < r.list.length; i++) {
-      if (r.list[i][0] !== "Sunrise" && ok(r.list[i][1]) && r.list[i][1] > now) return { name: r.list[i][0], time: r.list[i][1], today: r };
+      if (r.list[i][0] !== "Sunrise" && r.list[i][0] !== "Sunset" && ok(r.list[i][1]) && r.list[i][1] > now) return { name: r.list[i][0], time: r.list[i][1], today: r };
     }
     var t2 = ptCompute(new Date(now.getTime() + 86400000));
     if (t2 && ok(t2.list[0][1])) return { name: "Fajr", time: t2.list[0][1], today: r };
@@ -829,6 +853,7 @@ body.has-nav .player { bottom: 64px; }
       $("pt-locate").hidden = true;
       return;
     }
+    azRender();
     var nx = ptNext();
     $("pt-setup").hidden = !!nx;
     $("pt-main").hidden = !nx;
@@ -844,10 +869,21 @@ body.has-nav .player { bottom: 64px; }
       var li = el("li");
       li.appendChild(el("span", null, row[0]));
       li.appendChild(el("span", null, clock(row[1])));
-      if (row[0] === "Sunrise") li.className = "minor";
+      if (row[0] === "Sunrise" || row[0] === "Sunset") li.className = "minor";
       if (nx.time && row[0] === nx.name && row[1].getTime() === nx.time.getTime()) li.className = "is-next";
       list.appendChild(li);
     });
+    var week = $("pt-week");
+    week.textContent = "";
+    for (var k = 0; k < 7; k++) {
+      var day = new Date(d.getFullYear(), d.getMonth(), d.getDate() + k, 12), w = ptCompute(day), label = "";
+      try { label = day.toLocaleDateString(undefined, { weekday: "short", day: "numeric", month: "short" }); } catch (e) { label = day.toDateString(); }
+      var wl = el("li");
+      wl.appendChild(el("span", null, label));
+      wl.appendChild(el("span", null, "Sunrise " + clock(w.list[1][1]) + " · Sunset " + clock(w.list[4][1])));
+      week.appendChild(wl);
+    }
+    $("pt-week-box").hidden = false;
     $("pt-where").textContent = "For " + coordText() + " · " + methodName(nx.today.method) + " · times in this phone's time zone";
   }
   function setPlace(lat, lng) {
@@ -885,6 +921,159 @@ body.has-nav .player { bottom: 64px; }
     if (current) return;
     if (page === "prayer") renderPrayer(); else if (page === "home") homePrayer();
   }, 30000);
+
+  /* ---------- azan: recordings, player, optional call at prayer times ---------- */
+  var azList = [], azReady = false, azUrl = null, azNow = "";
+  var azAudio = new Audio();
+  var azFired = load("azfired", "");
+  var AZ_HELP = "The azan can sound only while this app is open on the screen. A web app cannot ring when it is closed or the phone is locked.";
+  function azDb(cb) {
+    try {
+      var r = indexedDB.open("quran-reader", 1);
+      r.onupgradeneeded = function () { r.result.createObjectStore("azan", { keyPath: "id", autoIncrement: true }); };
+      r.onsuccess = function () { cb(r.result); };
+      r.onerror = function () { cb(null); };
+    } catch (e) { cb(null); }
+  }
+  function azLoad(done) {
+    var out = [];
+    function fin() { azList = out; azReady = true; if (done) done(); }
+    function phone() {
+      azDb(function (db) {
+        if (!db) { fin(); return; }
+        try {
+          var q = db.transaction("azan").objectStore("azan").getAll();
+          q.onsuccess = function () {
+            (q.result || []).forEach(function (r) { out.push({ id: "p:" + r.id, key: r.id, name: r.name + " (on this phone)", blob: r.blob }); });
+            fin();
+          };
+          q.onerror = fin;
+        } catch (e) { fin(); }
+      });
+    }
+    var got;
+    try { got = fetch("azan/list.json").then(function (r) { return r.ok ? r.json() : []; }); } catch (e) { got = Promise.resolve([]); }
+    got.then(function (l) {
+      (Array.isArray(l) ? l : []).forEach(function (x) {
+        if (x && typeof x.file === "string" && x.name) out.push({ id: "f:" + x.file, name: String(x.name), src: "azan/" + encodeURIComponent(x.file) });
+      });
+    }).catch(function () {}).then(phone);
+  }
+  function azItem() {
+    for (var i = 0; i < azList.length; i++) if (azList[i].id === pt.azanPick) return azList[i];
+    return azList[0] || null;
+  }
+  function azNote(text, bad) {
+    var e = $("az-note");
+    e.textContent = text || AZ_HELP;
+    e.classList.toggle("bad", !!bad);
+  }
+  function azRender() {
+    var sel = $("az-pick");
+    sel.textContent = "";
+    if (!azList.length) {
+      var o = el("option", null, azReady ? "No recordings yet" : "Loading…");
+      o.value = "";
+      sel.appendChild(o);
+    }
+    azList.forEach(function (a) { var o2 = el("option", null, a.name); o2.value = a.id; sel.appendChild(o2); });
+    var it = azItem();
+    if (it) sel.value = it.id;
+    sel.disabled = !azList.length;
+    $("az-play").disabled = !azList.length;
+    $("az-stop").disabled = !azList.length;
+    $("az-remove").hidden = !(it && it.blob);
+    $("az-auto").checked = !!pt.azan;
+    if (!azList.length && azReady && !$("az-note").classList.contains("bad")) {
+      $("az-note").textContent = "No azan recording has been added yet. Tap “Add from this phone” and choose an audio file you have. " + AZ_HELP;
+    } else if (azList.length && !$("az-note").textContent) azNote("");
+  }
+  function azStart(prayerName) {
+    var it = azItem();
+    if (!it) { if (!prayerName) azNote("Add an azan recording first.", true); return; }
+    if (azUrl) { try { URL.revokeObjectURL(azUrl); } catch (e) {} azUrl = null; }
+    var src = it.src;
+    if (!src) { azUrl = URL.createObjectURL(it.blob); src = azUrl; }
+    try { audio.pause(); } catch (e) {}
+    azNow = prayerName ? "Azan for " + prayerName + " · " : "";
+    azAudio.src = src;
+    var p = azAudio.play();
+    if (p && p.catch) p.catch(function (err) {
+      if (err && err.name === "NotAllowedError") azNote((prayerName ? "It is time for " + prayerName + ". " : "") + "Tap Play to hear the azan.", true);
+    });
+  }
+  function mmss(x) { x = Math.max(0, Math.floor(x || 0)); return Math.floor(x / 60) + ":" + ("0" + (x % 60)).slice(-2); }
+  azAudio.addEventListener("playing", function () { $("az-play").textContent = "Pause"; azNote(azNow + "Playing " + (azItem() ? azItem().name : "")); });
+  azAudio.addEventListener("pause", function () { $("az-play").textContent = "Play"; });
+  azAudio.addEventListener("ended", function () { $("az-play").textContent = "Play"; $("az-time").textContent = ""; azNote(""); });
+  azAudio.addEventListener("error", function () { if (azAudio.getAttribute("src")) azNote("This recording could not be played. Choose another one or add it again.", true); });
+  azAudio.addEventListener("timeupdate", function () {
+    $("az-time").textContent = mmss(azAudio.currentTime) + (isFinite(azAudio.duration) ? " / " + mmss(azAudio.duration) : "");
+  });
+  $("az-play").addEventListener("click", function () {
+    if (!azAudio.paused) { azAudio.pause(); return; }
+    if (azAudio.getAttribute("src") && azAudio.currentTime > 0 && !azAudio.ended && !azAudio.error) { azAudio.play().catch(function () {}); return; }
+    azStart("");
+  });
+  $("az-stop").addEventListener("click", function () {
+    azAudio.pause();
+    try { azAudio.currentTime = 0; } catch (e) {}
+    $("az-time").textContent = "";
+    azNote("");
+  });
+  $("az-pick").addEventListener("change", function () {
+    pt.azanPick = this.value; save("prayer", pt);
+    if (!azAudio.paused) azStart(""); else { azAudio.removeAttribute("src"); $("az-time").textContent = ""; }
+    azRender();
+  });
+  $("az-auto").addEventListener("change", function () { pt.azan = this.checked; save("prayer", pt); azNote(""); });
+  $("az-add").addEventListener("click", function () { $("az-file").click(); });
+  $("az-file").addEventListener("change", function () {
+    var f = this.files && this.files[0];
+    this.value = "";
+    if (!f) return;
+    if (f.size > 25 * 1024 * 1024) { azNote("That file is larger than 25 MB. Choose a shorter recording.", true); return; }
+    azDb(function (db) {
+      if (!db) { azNote("This browser could not save the recording on the phone.", true); return; }
+      try {
+        var tx = db.transaction("azan", "readwrite");
+        var q = tx.objectStore("azan").add({ name: f.name.replace(/\.[^.]+$/, ""), blob: f });
+        q.onsuccess = function () {
+          pt.azanPick = "p:" + q.result; save("prayer", pt);
+          azLoad(function () { azNote("Added. It is saved on this phone only."); azRender(); });
+        };
+        q.onerror = function () { azNote("The recording could not be saved. The phone may be short of storage.", true); };
+      } catch (e) { azNote("The recording could not be saved on this phone.", true); }
+    });
+  });
+  $("az-remove").addEventListener("click", function () {
+    var it = azItem();
+    if (!it || !it.blob) return;
+    azAudio.pause(); azAudio.removeAttribute("src");
+    azDb(function (db) {
+      if (!db) return;
+      try {
+        var q = db.transaction("azan", "readwrite").objectStore("azan").delete(it.key);
+        q.onsuccess = function () { azLoad(function () { azNote("Removed from this phone."); azRender(); }); };
+      } catch (e) {}
+    });
+  });
+  function azTick() {
+    if (!pt.azan || pt.lat == null || !azReady) return;
+    var r = ptCompute(new Date());
+    if (!r) return;
+    var now = Date.now();
+    r.list.forEach(function (row) {
+      if (row[0] === "Sunrise" || row[0] === "Sunset" || !ok(row[1])) return;
+      var late = now - row[1].getTime(), key = row[0] + " " + row[1].toDateString();
+      if (late >= 0 && late < 120000 && azFired !== key) {
+        azFired = key; save("azfired", key);
+        azStart(row[0]);
+      }
+    });
+  }
+  setInterval(azTick, 15000);
+  azLoad(function () { if (page === "prayer" && !current) azRender(); });
 
   /* ---------- dhikr: adhkar, duas, 99 Names ---------- */
   var CHEV = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>';
