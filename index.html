@@ -254,17 +254,33 @@ body.has-nav.has-player .wrap { padding-bottom: 220px; }
   background: none; border: 1px solid var(--line); font-weight: 700; font-size: 14px;
 }
 .icon-btn svg { width: 20px; height: 20px; }
-.bar .title { flex: 1; min-width: 0; }
-.bar .title b { display: block; font-size: 15px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.bar .title span { display: block; font-size: 12px; color: var(--muted); }
-.nav-row { padding-top: 0; }
-.nav-row #pick-surah { flex: 1; min-width: 0; max-width: none; }
-.nav-row #jump { flex: none; max-width: 96px; }
-.next-btn {
-  flex: none; height: 40px; display: inline-flex; align-items: center; gap: 2px; padding: 0 10px 0 14px;
-  border-radius: 999px; border: 0; background: var(--accent); color: var(--accent-ink); font-weight: 600; font-size: 14px;
+.bar { position: sticky; }
+.bar-in { gap: 4px; padding-left: 10px; padding-right: 10px; }
+.bar-in > .icon-btn { min-width: 38px; width: 38px; height: 38px; padding: 0; }
+.bar select.title-pick {
+  flex: 1; min-width: 0; max-width: none; border: 0; background: none; padding: 0 0 0 2px;
+  font-size: 14px; font-weight: 700; color: var(--ink); text-overflow: ellipsis;
 }
-.next-btn svg { width: 18px; height: 18px; }
+.bar #jump { flex: none; width: 72px; padding: 0 2px 0 8px; font-size: 13px; height: 38px; }
+.aa-btn { font-family: var(--font-read); font-size: 17px; font-weight: 500; flex: none; }
+.aa-btn[aria-expanded="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.aa-panel {
+  position: absolute; right: 12px; top: calc(100% - 2px); width: min(320px, calc(100vw - 24px));
+  background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 6px 14px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18); display: grid;
+}
+@media (min-width: 664px) { .aa-panel { right: calc(50% - 308px); } }
+.aa-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--line); font-size: 14px; font-weight: 600; }
+.aa-row:last-child { border-bottom: 0; }
+.aa-row select { height: 36px; max-width: 170px; border-radius: 999px; border: 1px solid var(--line); background: var(--paper); padding: 0 10px; font-size: 14px; font-weight: 600; color: var(--ink); }
+.size-ctl { display: inline-flex; align-items: center; gap: 8px; }
+.size-ctl b { min-width: 32px; text-align: center; font-variant-numeric: tabular-nums; }
+.aa-panel .theme-switch { position: static; }
+.next-btn {
+  flex: none; height: 38px; display: inline-flex; align-items: center; gap: 0; padding: 0 4px 0 10px;
+  border-radius: 999px; border: 0; background: var(--accent); color: var(--accent-ink); font-weight: 600; font-size: 13px;
+}
+.next-btn svg { width: 16px; height: 16px; }
 .next-btn:disabled, .icon-btn:disabled { opacity: 0.35; cursor: default; }
 .bar select {
   height: 40px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface);
@@ -501,24 +517,22 @@ body.has-nav .player { bottom: 64px; }
 <div id="reader" hidden>
   <div class="bar">
     <div class="bar-in">
-      <button id="back" class="icon-btn" type="button" aria-label="Back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
-      <div class="title"><b id="r-title"></b><span id="r-sub"></span></div>
-      <button id="smaller" class="icon-btn" type="button" aria-label="Smaller Arabic text">A&minus;</button>
-      <button id="bigger" class="icon-btn" type="button" aria-label="Larger Arabic text">A+</button>
-    </div>
-    <div class="bar-in nav-row">
-      <button id="top-prev" class="icon-btn" type="button" aria-label="Previous surah" title="Previous surah"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
-      <select id="pick-surah" aria-label="Choose a surah"></select>
+      <button id="back" class="icon-btn" type="button" aria-label="Back" title="Back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
+      <select id="pick-surah" class="title-pick" aria-label="Choose a surah"></select>
       <select id="jump" aria-label="Go to ayah"></select>
+      <button id="aa" class="icon-btn aa-btn" type="button" aria-label="Reading settings" title="Reading settings" aria-expanded="false" aria-controls="aa-panel">Aa</button>
       <button id="top-next" class="next-btn" type="button" aria-label="Next surah" title="Next surah">Next<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
     </div>
-    <div class="progress" aria-hidden="true"><i id="r-progress"></i></div>
-  </div>
-  <main class="wrap">
-    <div class="surah-head">
-      <div class="ar" id="r-ar" lang="ar" dir="rtl"></div>
-      <p id="r-meta"></p>
-      <label class="lang" for="lang"><span>Meaning</span>
+    <div id="aa-panel" class="aa-panel" role="dialog" aria-label="Reading settings" hidden>
+      <div class="aa-row"><span>Theme</span><span id="aa-theme"></span></div>
+      <div class="aa-row"><span>Arabic text size</span>
+        <span class="size-ctl">
+          <button id="smaller" class="icon-btn" type="button" aria-label="Smaller Arabic text" title="Smaller Arabic text">A&minus;</button>
+          <b id="size-val" aria-live="polite"></b>
+          <button id="bigger" class="icon-btn" type="button" aria-label="Larger Arabic text" title="Larger Arabic text">A+</button>
+        </span>
+      </div>
+      <label class="aa-row" for="lang"><span>Meaning</span>
         <select id="lang">
           <option value="en">English</option>
           <option value="ml" lang="ml">മലയാളം (Malayalam)</option>
@@ -527,6 +541,13 @@ body.has-nav .player { bottom: 64px; }
           <option value="off">Off</option>
         </select>
       </label>
+    </div>
+    <div class="progress" aria-hidden="true"><i id="r-progress"></i></div>
+  </div>
+  <main class="wrap">
+    <div class="surah-head">
+      <div class="ar" id="r-ar" lang="ar" dir="rtl"></div>
+      <p id="r-meta"></p>
       <p id="lang-note" class="lang-note" role="status" hidden></p>
     </div>
     <div id="verses"></div>
@@ -595,6 +616,8 @@ body.has-nav .player { bottom: 64px; }
   function setSize(px) {
     size = Math.max(20, Math.min(48, px));
     document.documentElement.style.setProperty("--ar-size", size + "px");
+    var sv = document.getElementById("size-val");
+    if (sv) sv.textContent = size;
     save("size", size);
   }
   setSize(size);
@@ -1249,10 +1272,7 @@ body.has-nav .player { bottom: 64px; }
     current = n;
     stopSpeaking();
     $("pick-surah").value = String(n);
-    $("top-prev").disabled = n <= 1;
     $("top-next").disabled = n >= 114;
-    $("r-title").textContent = n + ". " + su[1];
-    $("r-sub").textContent = su[2] + " · Juz " + juzOf(n, ayah);
     $("r-ar").textContent = su[0];
     $("r-meta").textContent = su[2] + " · " + verses.length + " ayahs · " + (su[3] ? "Medinan" : "Meccan");
 
@@ -1283,7 +1303,6 @@ body.has-nav .player { bottom: 64px; }
         save("last", last);
         jump.value = top;
         setProgress(top, verses.length);
-        $("r-sub").textContent = su[2] + " · Juz " + juzOf(n, top);
       }
     }, { rootMargin: "-70px 0px -65% 0px" }) : null;
 
@@ -1466,7 +1485,7 @@ body.has-nav .player { bottom: 64px; }
     return box;
   }
   [].forEach.call(document.querySelectorAll(".page-head"), function (h) { h.appendChild(themeSwitch()); });
-  $("bigger").parentNode.insertBefore(themeSwitch(), $("smaller"));
+  $("aa-theme").appendChild(themeSwitch());
   applyTheme(theme);
 
   /* ---------- reading the meaning aloud (the phone's own text-to-speech voices) ---------- */
@@ -1548,13 +1567,29 @@ body.has-nav .player { bottom: 64px; }
   }
 
   /* ---------- top navigation in the reader ---------- */
+  // On narrow phones the surah number is left out of the bar so the name fits; the list stays in order.
+  function surahLabels() {
+    var narrow = window.innerWidth < 380, opts = $("pick-surah").options;
+    for (var i = 0; i < opts.length; i++) opts[i].textContent = (narrow ? "" : (i + 1) + ". ") + Q[i][1];
+  }
   Q.forEach(function (su, i) {
-    var o = el("option", null, (i + 1) + ". " + su[1] + " · " + su[2]);
+    var o = el("option", null, "");
     o.value = String(i + 1);
     $("pick-surah").appendChild(o);
   });
+  surahLabels();
+  window.addEventListener("resize", surahLabels);
   $("pick-surah").addEventListener("change", function () { var n = +this.value; if (n && n !== current) open(n, 1); });
-  $("top-prev").addEventListener("click", function () { if (current > 1) open(current - 1, 1); });
+  function setAa(openIt) {
+    $("aa-panel").hidden = !openIt;
+    $("aa").setAttribute("aria-expanded", openIt ? "true" : "false");
+  }
+  $("aa").addEventListener("click", function (e) { e.stopPropagation(); setAa($("aa-panel").hidden); });
+  document.addEventListener("click", function (e) {
+    if (!$("aa-panel").hidden && !$("aa-panel").contains(e.target) && e.target !== $("aa")) setAa(false);
+  });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !$("aa-panel").hidden) { setAa(false); $("aa").focus(); } });
+  window.addEventListener("hashchange", function () { setAa(false); });
   $("top-next").addEventListener("click", function () { if (current < 114) open(current + 1, 1); });
 
   /* ---------- meanings ---------- */
