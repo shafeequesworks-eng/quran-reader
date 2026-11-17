@@ -6,6 +6,13 @@
 <meta name="color-scheme" content="only light">
 <title>Quran Reader</title>
 <meta name="theme-color" content="#0f4a45">
+<script>
+  (function () {
+    var t = "light";
+    try { t = JSON.parse(localStorage.getItem("qr.theme")) === "dark" ? "dark" : "light"; } catch (e) {}
+    document.documentElement.setAttribute("data-theme", t);
+  })();
+</script>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
@@ -41,6 +48,23 @@
   --ar-size: 30px;
   color-scheme: only light;
 }
+:root[data-theme="dark"] {
+  --paper: #0d2a26;
+  --surface: #133630;
+  --ink: #f1ecdf;
+  --muted: #a7bcb5;
+  --line: #24504a;
+  --accent: #9fd8c9;
+  --accent-ink: #0d2a26;
+  --accent-soft: #1b4640;
+  --gold: #e0bf70;
+  --gold-ink: #1c1606;
+  --hero: #082320;
+  --hero-ink: #fffdf8;
+  --hero-gold: #e0bf70;
+  --bad: #ff9a90;
+  color-scheme: only dark;
+}
 * { box-sizing: border-box; }
 html, body { margin: 0; }
 body {
@@ -63,7 +87,19 @@ body.has-nav.has-player .wrap { padding-bottom: 220px; }
 .eyebrow { font-size: 12px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold); }
 
 /* ---------- Page heads ---------- */
-.page-head { padding: 22px 0 14px; }
+.page-head { padding: 22px 0 14px; position: relative; padding-right: 108px; }
+.theme-switch {
+  display: inline-flex; flex: none; padding: 3px; gap: 2px; border-radius: 999px;
+  border: 1px solid var(--line); background: var(--surface);
+}
+.page-head .theme-switch { position: absolute; right: 0; top: 22px; }
+.theme-switch button {
+  width: 46px; height: 32px; border: 0; border-radius: 999px; background: none; color: var(--muted);
+  display: grid; place-items: center; padding: 0;
+}
+.theme-switch button svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
+.theme-switch button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+:root[data-theme="dark"] .hero, :root[data-theme="dark"] .next, :root[data-theme="dark"] .count-btn { box-shadow: 0 0 0 1px var(--line); }
 .page-head h1 { margin: 0; font-size: 28px; font-weight: 700; letter-spacing: -0.02em; text-wrap: balance; }
 .page-head p { margin: 2px 0 0; color: var(--muted); font-size: 14px; }
 
@@ -1399,6 +1435,40 @@ body.has-nav .player { bottom: 64px; }
     var t = $("a" + this.value);
     if (t) t.scrollIntoView({ block: "start" });
   });
+  /* ---------- light / dark, chosen in the app (the phone's own setting is ignored) ---------- */
+  var theme = load("theme", "light") === "dark" ? "dark" : "light";
+  var SUN = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4"/></svg>';
+  var MOON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg>';
+  function applyTheme(t) {
+    theme = t === "dark" ? "dark" : "light";
+    document.documentElement.setAttribute("data-theme", theme);
+    save("theme", theme);
+    var meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute("content", theme === "dark" ? "#0d2a26" : "#0f4a45");
+    [].forEach.call(document.querySelectorAll(".theme-switch button"), function (b) {
+      b.setAttribute("aria-pressed", b.dataset.theme === theme ? "true" : "false");
+    });
+  }
+  function themeSwitch() {
+    var box = el("div", "theme-switch");
+    box.setAttribute("role", "group");
+    box.setAttribute("aria-label", "Colour theme");
+    [["light", SUN, "Light mode"], ["dark", MOON, "Dark mode"]].forEach(function (x) {
+      var b = el("button");
+      b.type = "button";
+      b.dataset.theme = x[0];
+      b.innerHTML = x[1];
+      b.setAttribute("aria-label", x[2]);
+      b.title = x[2];
+      b.addEventListener("click", function () { applyTheme(x[0]); });
+      box.appendChild(b);
+    });
+    return box;
+  }
+  [].forEach.call(document.querySelectorAll(".page-head"), function (h) { h.appendChild(themeSwitch()); });
+  $("bigger").parentNode.insertBefore(themeSwitch(), $("smaller"));
+  applyTheme(theme);
+
   /* ---------- reading the meaning aloud (the phone's own text-to-speech voices) ---------- */
   var SPEECH_LANG = { en: "en", ml: "ml", ta: "ta", hi: "hi" };
   var SPEECH_TAG = { en: "en-IN", ml: "ml-IN", ta: "ta-IN", hi: "hi-IN" };
