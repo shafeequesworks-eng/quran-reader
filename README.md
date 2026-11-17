@@ -3,7 +3,7 @@
 A personal, ad-free Quran reader with recitation audio.
 
 - Full Arabic text (Uthmani script), 114 surahs, browse by Surah or Juz
-- Meaning under each ayah in English, Malayalam, Tamil or Hindi (can be switched off)
+- Meaning under each ayah in English, Malayalam, Tamil or Hindi (can be switched off), read aloud with the phone's own voices
 - Recitation audio per ayah with a choice of reciters (needs internet)
 - Bookmarks, resume where you stopped, adjustable text size
 - Home page with continue reading and an ayah of the day, plus a tasbih counter

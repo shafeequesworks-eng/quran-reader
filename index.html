@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="only light">
 <title>Quran Reader</title>
 <meta name="theme-color" content="#0f4a45">
 <link rel="manifest" href="manifest.webmanifest">
@@ -38,43 +39,7 @@
   --font-read: "EB Garamond", Georgia, "Times New Roman", serif;
   --font-ar: "Quran Arabic", "Amiri Quran", "Scheherazade New", "Noto Naskh Arabic", "Traditional Arabic", serif;
   --ar-size: 30px;
-  color-scheme: light;
-}
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --paper: #0b1f1d;
-    --surface: #122c29;
-    --ink: #f1ecdf;
-    --muted: #9bb1aa;
-    --line: #213f3a;
-    --accent: #8fd0c0;
-    --accent-ink: #0b1f1d;
-    --accent-soft: #17383a;
-    --gold: #dcb968;
-    --gold-ink: #1c1606;
-    --hero: #15423d;
-    --hero-ink: #fffdf8;
-    --hero-gold: #dcb968;
-    --bad: #ff8a80;
-    color-scheme: dark;
-  }
-}
-:root[data-theme="dark"] {
-  --paper: #0b1f1d;
-  --surface: #122c29;
-  --ink: #f1ecdf;
-  --muted: #9bb1aa;
-  --line: #213f3a;
-  --accent: #8fd0c0;
-  --accent-ink: #0b1f1d;
-  --accent-soft: #17383a;
-  --gold: #dcb968;
-  --gold-ink: #1c1606;
-  --hero: #15423d;
-  --hero-ink: #fffdf8;
-  --hero-gold: #dcb968;
-  --bad: #ff8a80;
-  color-scheme: dark;
+  color-scheme: only light;
 }
 * { box-sizing: border-box; }
 html, body { margin: 0; }
@@ -256,6 +221,15 @@ body.has-nav.has-player .wrap { padding-bottom: 220px; }
 .bar .title { flex: 1; min-width: 0; }
 .bar .title b { display: block; font-size: 15px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .bar .title span { display: block; font-size: 12px; color: var(--muted); }
+.nav-row { padding-top: 0; }
+.nav-row #pick-surah { flex: 1; min-width: 0; max-width: none; }
+.nav-row #jump { flex: none; max-width: 96px; }
+.next-btn {
+  flex: none; height: 40px; display: inline-flex; align-items: center; gap: 2px; padding: 0 10px 0 14px;
+  border-radius: 999px; border: 0; background: var(--accent); color: var(--accent-ink); font-weight: 600; font-size: 14px;
+}
+.next-btn svg { width: 18px; height: 18px; }
+.next-btn:disabled, .icon-btn:disabled { opacity: 0.35; cursor: default; }
 .bar select {
   height: 40px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface);
   padding: 0 10px; max-width: 108px; font-size: 14px;
@@ -288,6 +262,9 @@ body.has-nav.has-player .wrap { padding-bottom: 220px; }
 .ayah .tr:lang(ml), .ayah .tr:lang(ta), .ayah .tr:lang(hi) { font-family: var(--font-ui); font-size: 15px; line-height: 1.75; }
 .bismillah-tr { text-align: center; color: var(--muted); font-family: var(--font-read); font-size: 16px; margin: 0 0 6px; }
 .tr:empty, .bismillah-tr:empty { display: none; }
+.tool.say[hidden] { display: none; }
+.tool.say.speaking { color: var(--gold-ink); background: var(--gold); }
+.tool.say.speaking svg { stroke: currentColor; }
 .lang { display: inline-flex; align-items: center; gap: 8px; margin-top: 12px; font-size: 13px; font-weight: 600; color: var(--muted); }
 .lang select { height: 36px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); padding: 0 12px; font-size: 14px; font-weight: 600; color: var(--ink); }
 .lang-note { margin: 8px 0 0; font-size: 13px; color: var(--muted); }
@@ -317,7 +294,7 @@ body.has-nav .player { bottom: 64px; }
 .p-play .i-pause, .p-play.is-playing .i-play { display: none; }
 .p-play.is-playing .i-pause { display: block; }
 .p-status { font-size: 13px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.p-status.bad { color: var(--bad); }
+.p-status.bad { color: var(--bad); white-space: normal; overflow: visible; }
 
 .nav { position: fixed; left: 0; right: 0; bottom: 0; z-index: 7; height: 64px; background: var(--surface); border-top: 1px solid var(--line); }
 .nav-in { max-width: 640px; height: 100%; margin: 0 auto; display: flex; }
@@ -490,9 +467,14 @@ body.has-nav .player { bottom: 64px; }
     <div class="bar-in">
       <button id="back" class="icon-btn" type="button" aria-label="Back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
       <div class="title"><b id="r-title"></b><span id="r-sub"></span></div>
-      <select id="jump" aria-label="Go to ayah"></select>
       <button id="smaller" class="icon-btn" type="button" aria-label="Smaller Arabic text">A&minus;</button>
       <button id="bigger" class="icon-btn" type="button" aria-label="Larger Arabic text">A+</button>
+    </div>
+    <div class="bar-in nav-row">
+      <button id="top-prev" class="icon-btn" type="button" aria-label="Previous surah" title="Previous surah"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
+      <select id="pick-surah" aria-label="Choose a surah"></select>
+      <select id="jump" aria-label="Go to ayah"></select>
+      <button id="top-next" class="next-btn" type="button" aria-label="Next surah" title="Next surah">Next<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
     </div>
     <div class="progress" aria-hidden="true"><i id="r-progress"></i></div>
   </div>
@@ -600,6 +582,7 @@ body.has-nav .player { bottom: 64px; }
   var ICONS = {
     play: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 7.500v9l7-4.500z"/></svg>',
     mark: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h10a1 1 0 0 1 1 1v15l-6-4-6 4V5a1 1 0 0 1 1-1z"/></svg>',
+    say: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5z"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/></svg>',
     copy: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h8"/></svg>',
     done: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.500l4.5 4.500L19 7.5"/></svg>'
   };
@@ -1228,6 +1211,10 @@ body.has-nav .player { bottom: 64px; }
   function renderSurah(n, ayah) {
     var su = Q[n - 1], verses = su[4];
     current = n;
+    stopSpeaking();
+    $("pick-surah").value = String(n);
+    $("top-prev").disabled = n <= 1;
+    $("top-next").disabled = n >= 114;
     $("r-title").textContent = n + ". " + su[1];
     $("r-sub").textContent = su[2] + " · Juz " + juzOf(n, ayah);
     $("r-ar").textContent = su[0];
@@ -1283,6 +1270,9 @@ body.has-nav .player { bottom: 64px; }
       var pl = tool("play", "play", "Play from this ayah");
       pl.addEventListener("click", function () { playFrom(n, a); });
       tools.appendChild(pl);
+      var say = tool("say", "say", "Listen to the meaning");
+      say.addEventListener("click", function () { speakMeaning(row, say); });
+      tools.appendChild(say);
       var saved = marks.indexOf(key) >= 0;
       var mk = tool("", "mark", saved ? "Remove bookmark" : "Bookmark this ayah");
       mk.setAttribute("aria-pressed", saved ? "true" : "false");
@@ -1334,6 +1324,7 @@ body.has-nav .player { bottom: 64px; }
   var NAV_OF = { dua: "dhikr", names: "dhikr", tasbih: "dhikr" };
   var pendingAyah = 1, shown = false;
   function showPage(p, arg) {
+    stopSpeaking();
     page = p;
     pageArg = arg || 0;
     current = 0;
@@ -1408,6 +1399,94 @@ body.has-nav .player { bottom: 64px; }
     var t = $("a" + this.value);
     if (t) t.scrollIntoView({ block: "start" });
   });
+  /* ---------- reading the meaning aloud (the phone's own text-to-speech voices) ---------- */
+  var SPEECH_LANG = { en: "en", ml: "ml", ta: "ta", hi: "hi" };
+  var SPEECH_TAG = { en: "en-IN", ml: "ml-IN", ta: "ta-IN", hi: "hi-IN" };
+  var synth = window.speechSynthesis || null, speakBtn = null, speakJob = 0;
+  function voiceFor(code) {
+    if (!synth) return null;
+    var want = SPEECH_LANG[code], list = [];
+    try { list = synth.getVoices() || []; } catch (e) {}
+    var best = null;
+    list.forEach(function (v) {
+      var l = (v.lang || "").toLowerCase().replace("_", "-");
+      if (l === want || l.indexOf(want + "-") === 0) {
+        if (!best || (l === SPEECH_TAG[code].toLowerCase() && (best.lang || "").toLowerCase() !== l) || (v.localService && !best.localService)) best = v;
+      }
+    });
+    return best;
+  }
+  if (synth && synth.addEventListener) { try { synth.addEventListener("voiceschanged", function () {}); synth.getVoices(); } catch (e) {} }
+  function stopSpeaking() {
+    speakJob++;
+    if (speakBtn) { speakBtn.classList.remove("speaking"); speakBtn.setAttribute("aria-label", "Listen to the meaning"); speakBtn.title = "Listen to the meaning"; }
+    speakBtn = null;
+    try { if (synth) synth.cancel(); } catch (e) {}
+  }
+  function chunks(text) {
+    var parts = text.match(/[^.!?।؟\n]+[.!?।؟]*\s*/g) || [text], out = [], cur = "";
+    parts.forEach(function (p) {
+      if ((cur + p).length > 220 && cur) { out.push(cur); cur = ""; }
+      cur += p;
+    });
+    if (cur.trim()) out.push(cur);
+    return out;
+  }
+  function speakMeaning(row, btn) {
+    var t = row.querySelector(".tr"), text = t ? t.textContent.trim() : "";
+    if (speakBtn === btn) { stopSpeaking(); status(""); return; }
+    stopSpeaking();
+    if (!text) return;
+    if (!synth || !window.SpeechSynthesisUtterance) {
+      status("This browser cannot read text aloud. Open the app in Chrome to use this.", true);
+      return;
+    }
+    try { if (!audio.paused) audio.pause(); } catch (e) {}
+    var code = lang, v = voiceFor(code), job = ++speakJob, list = chunks(text), i = 0;
+    speakBtn = btn;
+    btn.classList.add("speaking");
+    btn.setAttribute("aria-label", "Stop reading the meaning");
+    btn.title = "Stop reading the meaning";
+    var started = false;
+    function next() {
+      if (job !== speakJob) return;
+      if (i >= list.length) { stopSpeaking(); return; }
+      var u = new SpeechSynthesisUtterance(list[i++]);
+      u.lang = v ? v.lang : SPEECH_TAG[code];
+      if (v) u.voice = v;
+      u.rate = 0.95;
+      u.onstart = function () { started = true; };
+      u.onend = function () { next(); };
+      u.onerror = function (ev) {
+        if (job !== speakJob) return;
+        var why = ev && ev.error;
+        stopSpeaking();
+        if (why === "interrupted" || why === "canceled") return;
+        status(noVoiceText(code), true);
+      };
+      synth.speak(u);
+    }
+    next();
+    syncPlayer();
+    status("Reading the " + LANG_NAMES[code] + " meaning of " + Q[current - 1][1] + " " + current + ":" + row.dataset.a + (v ? "" : " (if you hear nothing, see below)"));
+    setTimeout(function () {
+      if (job === speakJob && !started && !(synth.speaking || synth.pending)) { stopSpeaking(); status(noVoiceText(code), true); }
+    }, 4000);
+  }
+  function noVoiceText(code) {
+    return "Your phone has no " + LANG_NAMES[code] + " voice installed. On Android, open Settings → search \"Text-to-speech\" → Google speech services → Install voice data → " + LANG_NAMES[code] + ", then try again.";
+  }
+
+  /* ---------- top navigation in the reader ---------- */
+  Q.forEach(function (su, i) {
+    var o = el("option", null, (i + 1) + ". " + su[1] + " · " + su[2]);
+    o.value = String(i + 1);
+    $("pick-surah").appendChild(o);
+  });
+  $("pick-surah").addEventListener("change", function () { var n = +this.value; if (n && n !== current) open(n, 1); });
+  $("top-prev").addEventListener("click", function () { if (current > 1) open(current - 1, 1); });
+  $("top-next").addEventListener("click", function () { if (current < 114) open(current + 1, 1); });
+
   /* ---------- meanings ---------- */
   var LANG_NAMES = { en: "English", ml: "Malayalam", ta: "Tamil", hi: "Hindi" };
   var lang = load("lang", load("tr", true) === false ? "off" : "en");
@@ -1448,11 +1527,14 @@ body.has-nav .player { bottom: 64px; }
       var t = row.querySelector(".tr");
       t.textContent = data ? clean(data[current - 1][+row.dataset.a - 1] || "") : "";
       if (data) t.lang = lang;
+      var sb = row.querySelector(".tool.say");
+      if (sb) { sb.hidden = !t.textContent; sb.title = sb.title; }
     });
     var bis = document.querySelector("#verses .bismillah-tr");
     if (bis) { bis.textContent = data ? clean(data[0][0]) : ""; if (data) bis.lang = lang; }
   }
   function setLang(code) {
+    stopSpeaking();
     lang = code;
     save("lang", lang);
     $("lang").value = lang;
@@ -1548,6 +1630,7 @@ body.has-nav .player { bottom: 64px; }
     });
   }
   function loadTrack(s, a, bis, single) {
+    stopSpeaking();
     var r = reciter();
     track = { s: s, a: a, bis: !!bis, single: !!single, i: 0, tried: 0 };
     track.list = sources(r, bis ? 1 : s, bis ? 1 : a);
