@@ -9,6 +9,7 @@ A personal, ad-free Quran reader with recitation audio.
 - Home page with continue reading and an ayah of the day, plus a tasbih counter
 - Prayer times calculated on the device from your location, with a choice of calculation method
 - Morning and evening adhkar, duas from Hisn al-Muslim, and the 99 Names of Allah
+- Now / Next prayer cards on Home, a Qibla compass corrected to true north, a bead tasbih, and an ayah of the day you can share as a story or post
 - Installable on Android: open the site in Chrome and choose "Add to Home screen"
 
 Text: Noble Qur'an Encyclopedia (quranenc.com) via the quran-json project (CC BY 4.0).
@@ -17,3 +18,4 @@ Audio: streamed from the Islamic Network CDN (alquran.cloud) and EveryAyah.
 Font: Amiri Quran (SIL Open Font License).
 Prayer times: adhan-js (MIT).
 Adhkar, duas and the 99 Names: muslim-data by Kosrat D. Ahmad (MIT), via the react-native-prayer-times package.
+Qibla compass declination: World Magnetic Model 2025 via the geomagnetism package (Apache-2.0).
