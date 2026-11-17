@@ -259,9 +259,9 @@ body.has-nav.has-player .wrap { padding-bottom: 220px; }
 .bar-in > .icon-btn { min-width: 38px; width: 38px; height: 38px; padding: 0; }
 .bar select.title-pick {
   flex: 1; min-width: 0; max-width: none; border: 0; background: none; padding: 0 0 0 2px;
-  font-size: 14px; font-weight: 700; color: var(--ink); text-overflow: ellipsis;
+  font-size: 16px; font-weight: 700; color: var(--ink); text-overflow: ellipsis;
 }
-.bar #jump { flex: none; width: 72px; padding: 0 2px 0 8px; font-size: 13px; height: 38px; }
+.bar #jump { display: none; }
 .aa-btn { font-family: var(--font-read); font-size: 17px; font-weight: 500; flex: none; }
 .aa-btn[aria-expanded="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
 .aa-panel {
@@ -519,7 +519,7 @@ body.has-nav .player { bottom: 64px; }
     <div class="bar-in">
       <button id="back" class="icon-btn" type="button" aria-label="Back" title="Back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
       <select id="pick-surah" class="title-pick" aria-label="Choose a surah"></select>
-      <select id="jump" aria-label="Go to ayah"></select>
+      <select id="jump" aria-label="Go to ayah" hidden tabindex="-1"></select>
       <button id="aa" class="icon-btn aa-btn" type="button" aria-label="Reading settings" title="Reading settings" aria-expanded="false" aria-controls="aa-panel">Aa</button>
       <button id="top-next" class="next-btn" type="button" aria-label="Next surah" title="Next surah">Next<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
     </div>
@@ -1567,9 +1567,9 @@ body.has-nav .player { bottom: 64px; }
   }
 
   /* ---------- top navigation in the reader ---------- */
-  // On narrow phones the surah number is left out of the bar so the name fits; the list stays in order.
+  // On very narrow screens the surah number is left out of the bar so the name fits; the list stays in order.
   function surahLabels() {
-    var narrow = window.innerWidth < 380, opts = $("pick-surah").options;
+    var narrow = window.innerWidth < 330, opts = $("pick-surah").options;
     for (var i = 0; i < opts.length; i++) opts[i].textContent = (narrow ? "" : (i + 1) + ". ") + Q[i][1];
   }
   Q.forEach(function (su, i) {
