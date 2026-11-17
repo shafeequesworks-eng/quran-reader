@@ -332,6 +332,7 @@ body.has-nav.has-player .wrap { padding-bottom: 220px; }
 .q-read b { display: block; font-size: 30px; font-weight: 700; font-variant-numeric: tabular-nums; }
 .q-read span { color: var(--muted); font-size: 14px; }
 .q-read.aligned b { color: var(--gold); }
+.q-where { display: block; margin-top: 4px; font-size: 13px; color: var(--muted); }
 
 /* ---------- Opening screen ---------- */
 .splash {
@@ -700,7 +701,7 @@ body:not(.has-nav) .player { padding-bottom: env(safe-area-inset-bottom, 0px); }
       <span class="pointer" aria-hidden="true"></span>
       <svg class="dial" id="dial" viewBox="0 0 300 300" role="img" aria-label="Compass"></svg>
     </div>
-    <div class="q-read" id="q-read" role="status"><b id="q-big">—</b><span id="q-small">Set your location to find the Qibla.</span></div>
+    <div class="q-read" id="q-read" role="status"><b id="q-big">—</b><span id="q-small">Set your location to find the Qibla.</span><span id="q-where" class="q-where"></span></div>
     <div class="az-row" style="justify-content:center">
       <button id="q-locate" class="pill" type="button">Use my location</button>
       <button id="q-start" class="pill solid" type="button">Start compass</button>
@@ -1388,7 +1389,9 @@ body:not(.has-nav) .player { padding-bottom: env(safe-area-inset-bottom, 0px); }
   function setPlace(lat, lng) {
     pt.lat = Math.round(lat * 10000) / 10000;
     pt.lng = Math.round(lng * 10000) / 10000;
+    pt.at = Date.now();
     save("prayer", pt);
+    if (page === "qibla") $("q-note").textContent = "";
     ptNote("");
     renderPrayer();
     if (page === "qibla" && !current) renderQibla();
@@ -1402,7 +1405,7 @@ body:not(.has-nav) .player { padding-bottom: env(safe-area-inset-bottom, 0px); }
       ptNote(err && err.code === 1
         ? "Location permission is off for this app. Allow location in your browser's site settings and try again, or enter your coordinates below."
         : "Could not find your location. Check that location is switched on and try again, or enter your coordinates below.", true);
-    }, { enableHighAccuracy: false, timeout: 15000, maximumAge: 600000 });
+    }, { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 });   // always a fresh reading, so moving to a new place is picked up
   }
   PT_METHODS.forEach(function (m) { var o = el("option", null, m[1]); o.value = m[0]; $("pt-method").appendChild(o); });
   $("pt-locate").addEventListener("click", locate);
@@ -1618,10 +1621,17 @@ body:not(.has-nav) .player { padding-bottom: env(safe-area-inset-bottom, 0px); }
     if (!has) {
       $("q-big").textContent = "—";
       $("q-small").textContent = "Set your location to find the Qibla.";
+      $("q-where").textContent = "";
       $("q-mark").style.display = "none";
       return;
     }
     var bearing = qiblaBearing(pt.lat, pt.lng), km = kmToMakkah(pt.lat, pt.lng);
+    var when = "";
+    if (pt.at) {
+      var mins = Math.round((Date.now() - pt.at) / 60000);
+      when = mins < 1 ? " · updated just now" : mins < 60 ? " · updated " + mins + " min ago" : mins < 1440 ? " · updated " + Math.round(mins / 60) + " h ago" : " · updated " + Math.round(mins / 1440) + " days ago";
+    }
+    $("q-where").textContent = "Your location: " + coordText() + when;
     qDecl = window.magDeclination ? (window.magDeclination(pt.lat, pt.lng) || 0) : 0;
     $("q-mark").style.display = "";
     $("q-mark").setAttribute("transform", "rotate(" + bearing.toFixed(1) + " 150 150)");
