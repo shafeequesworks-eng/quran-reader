@@ -3,6 +3,7 @@
   "short_name": "Quran",
   "description": "Read and listen to the Quran. No ads.",
   "start_url": "./",
+  "id": "./",
   "scope": "./",
   "display": "standalone",
   "background_color": "#f7f3ec",

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="only light">
 <title>Quran Reader</title>
 <meta name="theme-color" content="#0f4a45">
@@ -15,7 +15,11 @@
 </script>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png">
-<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Quran Reader">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=DM+Sans:wght@400;500;600;700&family=EB+Garamond:wght@400;500&display=swap" rel="stylesheet">
@@ -70,6 +74,9 @@
 * { box-sizing: border-box; }
 html, body { margin: 0; }
 body {
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
   background: var(--paper);
   color: var(--ink);
   font-family: var(--font-ui);
@@ -361,7 +368,7 @@ body.has-nav.has-player .wrap { padding-bottom: 220px; }
 }
 
 /* ---------- Reader ---------- */
-.bar { position: sticky; top: 0; z-index: 5; background: var(--paper); }
+.bar { position: sticky; top: 0; z-index: 5; background: var(--paper); padding-top: env(safe-area-inset-top, 0px); }
 .bar-in { max-width: 640px; margin: 0 auto; padding: 8px 12px; display: flex; align-items: center; gap: 8px; }
 .icon-btn {
   min-width: 40px; height: 40px; padding: 0 10px; border-radius: 999px; display: grid; place-items: center;
@@ -493,7 +500,9 @@ body.has-nav.has-player .wrap { padding-bottom: 220px; }
 
 /* ---------- Player + bottom bar ---------- */
 .player { position: fixed; left: 0; right: 0; bottom: 0; z-index: 6; background: var(--surface); border-top: 1px solid var(--line); }
-body.has-nav .player { bottom: 64px; }
+body.has-nav .player { bottom: calc(64px + env(safe-area-inset-bottom, 0px)); }
+body:not(.has-nav) { padding-top: 0; }
+body:not(.has-nav) .player { padding-bottom: env(safe-area-inset-bottom, 0px); }
 .player-in { max-width: 640px; margin: 0 auto; padding: 8px 12px 10px; display: grid; gap: 6px; }
 .p-row { display: flex; align-items: center; gap: 8px; }
 .p-row select { flex: 1; min-width: 0; height: 40px; border-radius: 999px; border: 1px solid var(--line); background: var(--paper); padding: 0 12px; font-size: 14px; }
@@ -504,7 +513,7 @@ body.has-nav .player { bottom: 64px; }
 .p-status { font-size: 13px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .p-status.bad { color: var(--bad); white-space: normal; overflow: visible; }
 
-.nav { position: fixed; left: 0; right: 0; bottom: 0; z-index: 7; height: 64px; background: var(--surface); border-top: 1px solid var(--line); }
+.nav { position: fixed; left: 0; right: 0; bottom: 0; z-index: 7; height: calc(64px + env(safe-area-inset-bottom, 0px)); padding-bottom: env(safe-area-inset-bottom, 0px); background: var(--surface); border-top: 1px solid var(--line); }
 .nav-in { max-width: 640px; height: 100%; margin: 0 auto; display: flex; }
 .nav button { flex: 1; background: none; border: 0; display: grid; place-content: center; justify-items: center; gap: 2px; color: var(--muted); font-size: 12px; font-weight: 600; }
 .nav button svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
