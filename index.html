@@ -256,7 +256,8 @@ body.has-nav.has-player .wrap { padding-bottom: 220px; }
 .icon-btn svg { width: 20px; height: 20px; }
 .bar { position: sticky; }
 .bar-in { gap: 4px; padding-left: 10px; padding-right: 10px; }
-.bar-in > .icon-btn { min-width: 38px; width: 38px; height: 38px; padding: 0; }
+.bar-in > .icon-btn { min-width: 36px; width: 36px; height: 36px; padding: 0; }
+@media (max-width: 379px) { .bar-in { gap: 3px; padding-left: 8px; padding-right: 8px; } }
 .title-pick {
   flex: 1; min-width: 0; height: 38px; display: flex; align-items: center; gap: 4px;
   border: 0; background: none; padding: 0 2px; text-align: left;
@@ -293,6 +294,18 @@ body.has-nav.has-player .wrap { padding-bottom: 220px; }
 .bar #jump { display: none; }
 .aa-btn { font-family: var(--font-read); font-size: 17px; font-weight: 500; flex: none; }
 .aa-btn[aria-expanded="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+#tr-btn svg { width: 19px; height: 19px; }
+.tr-panel { width: min(280px, calc(100vw - 20px)); padding: 8px; }
+.tr-head { margin: 4px 8px 6px; font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gold); }
+.tr-tip { margin: 6px 8px 4px; font-size: 12px; color: var(--muted); }
+#tr-list button {
+  width: 100%; min-height: 46px; display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  border: 0; border-radius: 10px; background: none; padding: 0 12px; text-align: left; font-size: 15px; font-weight: 600; color: var(--ink);
+}
+#tr-list button small { display: block; font-size: 12px; font-weight: 500; color: var(--muted); }
+#tr-list button i { width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--line); flex: none; }
+#tr-list button[aria-checked="true"] { background: var(--accent-soft); }
+#tr-list button[aria-checked="true"] i { border: 6px solid var(--gold); }
 .aa-panel {
   position: absolute; right: 12px; top: calc(100% - 2px); width: min(320px, calc(100vw - 24px));
   background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 6px 14px;
@@ -550,6 +563,7 @@ body.has-nav .player { bottom: 64px; }
       <button id="pick-surah" class="title-pick" type="button" aria-haspopup="listbox" aria-expanded="false" aria-controls="surah-panel"><span id="pick-label"></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
       <select id="jump" aria-label="Go to ayah" hidden tabindex="-1"></select>
       <button id="aa" class="icon-btn aa-btn" type="button" aria-label="Reading settings" title="Reading settings" aria-expanded="false" aria-controls="aa-panel">Aa</button>
+      <button id="tr-btn" class="icon-btn aa-btn" type="button" aria-label="Translation language" title="Translation language" aria-expanded="false" aria-controls="tr-panel"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12.87 15.07l-2.54-2.51.03-.03c1.74-1.94 2.98-4.17 3.71-6.53H17V4h-7V2H8v2H1v1.99h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z"/></svg></button>
       <button id="top-next" class="next-btn" type="button" aria-label="Next surah" title="Next surah">Next<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
     </div>
     <div id="surah-panel" class="surah-panel" hidden>
@@ -566,8 +580,13 @@ body.has-nav .player { bottom: 64px; }
           <button id="bigger" class="icon-btn" type="button" aria-label="Larger Arabic text" title="Larger Arabic text">A+</button>
         </span>
       </div>
-      <label class="aa-row" for="lang"><span>Meaning</span>
-        <select id="lang">
+    </div>
+    <div id="tr-panel" class="aa-panel tr-panel" role="dialog" aria-label="Translation language" hidden>
+      <p class="tr-head">Meaning shown under each ayah</p>
+      <div id="tr-list" role="radiogroup" aria-label="Translation language"></div>
+      <p class="tr-tip">Tap the speaker under an ayah to hear its meaning.</p>
+      <label hidden>
+        <select id="lang" tabindex="-1">
           <option value="en">English</option>
           <option value="ml" lang="ml">മലയാളം (Malayalam)</option>
           <option value="ta" lang="ta">தமிழ் (Tamil)</option>
@@ -1602,7 +1621,7 @@ body.has-nav .player { bottom: 64px; }
 
   /* ---------- top navigation in the reader ---------- */
   // The surah name opens the app's own short, scrollable list (the phone's picker covered the whole screen).
-  function surahLabel(n) { return (window.innerWidth < 330 ? "" : n + ". ") + Q[n - 1][1]; }
+  function surahLabel(n) { return (window.innerWidth < 380 ? "" : n + ". ") + Q[n - 1][1]; }
   function setSurahLabel() { if (current) $("pick-label").textContent = surahLabel(current); }
   window.addEventListener("resize", setSurahLabel);
   Q.forEach(function (su, i) {
@@ -1636,6 +1655,7 @@ body.has-nav .player { bottom: 64px; }
     $("pick-surah").setAttribute("aria-expanded", openIt ? "true" : "false");
     if (!openIt) return;
     setAa(false);
+    setTr(false);
     $("surah-find").value = "";
     filterSurahs();
     var menu = $("surah-menu"), cur = null;
@@ -1658,11 +1678,42 @@ body.has-nav .player { bottom: 64px; }
   });
   document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !$("surah-panel").hidden) { setSurahMenu(false); $("pick-surah").focus(); } });
   window.addEventListener("hashchange", function () { setSurahMenu(false); });
+  var TR_CHOICES = [["en", "English", "Saheeh International"], ["ml", "മലയാളം", "Malayalam"], ["ta", "தமிழ்", "Tamil"], ["hi", "हिन्दी", "Hindi"], ["off", "Off", "Arabic only"]];
+  TR_CHOICES.forEach(function (c) {
+    var b = el("button");
+    b.type = "button";
+    b.setAttribute("role", "radio");
+    b.dataset.lang = c[0];
+    var t = el("span"); var nm = el("span", null, c[1]); if (c[0] !== "en" && c[0] !== "off") nm.lang = c[0];
+    t.appendChild(nm); t.appendChild(el("small", null, c[2]));
+    b.appendChild(t); b.appendChild(el("i"));
+    b.addEventListener("click", function () { setLang(c[0]); markTr(); setTr(false); });
+    $("tr-list").appendChild(b);
+  });
+  function markTr() {
+    [].forEach.call($("tr-list").children, function (b) { b.setAttribute("aria-checked", b.dataset.lang === lang ? "true" : "false"); });
+  }
+  function setTr(openIt) {
+    $("tr-panel").hidden = !openIt;
+    $("tr-btn").setAttribute("aria-expanded", openIt ? "true" : "false");
+    if (openIt) { markTr(); var on = $("tr-list").querySelector('[aria-checked="true"]'); if (on) on.focus({ preventScroll: true }); }
+  }
+  $("tr-btn").addEventListener("click", function (e) {
+    e.stopPropagation();
+    var openIt = $("tr-panel").hidden;
+    if (openIt) { setSurahMenu(false); setAa(false); }
+    setTr(openIt);
+  });
+  document.addEventListener("click", function (e) {
+    if (!$("tr-panel").hidden && !$("tr-panel").contains(e.target) && !$("tr-btn").contains(e.target)) setTr(false);
+  });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !$("tr-panel").hidden) { setTr(false); $("tr-btn").focus(); } });
+  window.addEventListener("hashchange", function () { setTr(false); });
   function setAa(openIt) {
     $("aa-panel").hidden = !openIt;
     $("aa").setAttribute("aria-expanded", openIt ? "true" : "false");
   }
-  $("aa").addEventListener("click", function (e) { e.stopPropagation(); if ($("aa-panel").hidden) setSurahMenu(false); setAa($("aa-panel").hidden); });
+  $("aa").addEventListener("click", function (e) { e.stopPropagation(); if ($("aa-panel").hidden) { setSurahMenu(false); setTr(false); } setAa($("aa-panel").hidden); });
   document.addEventListener("click", function (e) {
     if (!$("aa-panel").hidden && !$("aa-panel").contains(e.target) && e.target !== $("aa")) setAa(false);
   });
