@@ -270,6 +270,23 @@ body.has-nav.has-player .wrap { padding-bottom: 220px; }
 .dua .side { margin: 0; font-size: 14px; color: var(--muted); white-space: pre-line; }
 .dua .foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .dua .ref { font-size: 12px; color: var(--muted); }
+.dua .why { display: grid; gap: 2px; background: var(--paper); border-radius: 12px; padding: 10px 12px; font-size: 14px; line-height: 1.45; }
+.dua .why b { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.dua .heart { width: 40px; height: 40px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); display: grid; place-items: center; color: var(--muted); }
+.dua .heart svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linejoin: round; }
+.dua .heart[aria-pressed="true"] { color: var(--accent); border-color: var(--accent); }
+.dua .heart[aria-pressed="true"] svg { fill: currentColor; }
+.dua .foot .acts { display: flex; align-items: center; gap: 8px; }
+.dua-bar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.dua-bar label { font-size: 13px; font-weight: 600; color: var(--muted); }
+.dua-bar select { height: 38px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); padding: 0 14px; font-weight: 600; font-size: 14px; color: var(--ink); }
+details.sit { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 0 16px; }
+details.sit > summary { list-style: none; cursor: pointer; padding: 14px 0; display: grid; gap: 2px; }
+details.sit > summary::-webkit-details-marker { display: none; }
+details.sit > summary b { font-size: 16px; }
+details.sit > summary small { color: var(--muted); font-size: 13px; }
+details.sit[open] > summary { border-bottom: 1px solid var(--line); margin-bottom: 14px; }
+details.sit .stack { padding-bottom: 16px; }
 .rep { flex: none; min-height: 40px; border-radius: 999px; border: 1.5px solid var(--gold); background: none; color: var(--gold); padding: 0 16px; font-weight: 700; font-size: 14px; font-variant-numeric: tabular-nums; }
 .rep.done { background: var(--gold); color: var(--gold-ink); }
 .names { list-style: none; margin: 0; padding: 0; }
@@ -684,6 +701,20 @@ body:not(.has-nav) .player { padding-bottom: env(safe-area-inset-bottom, 0px); }
   <button class="backlink" type="button" data-go="dhikr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>Dhikr</button>
   <div class="page-head"><h1 id="dua-title"></h1><p id="dua-sub"></p></div>
   <div id="dua-list" class="stack"></div>
+</main>
+
+<!-- Duas by situation -->
+<main id="situations" class="wrap page" hidden>
+  <button class="backlink" type="button" data-go="dhikr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>Dhikr</button>
+  <div class="page-head"><h1>Duas for every situation</h1><p>What to say, and why</p></div>
+  <div id="sit-list" class="stack"></div>
+</main>
+
+<!-- Saved duas -->
+<main id="saveddua" class="wrap page" hidden>
+  <button class="backlink" type="button" data-go="dhikr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>Dhikr</button>
+  <div class="page-head"><h1>Saved duas</h1><p>The duas you have kept</p></div>
+  <div id="saved-list" class="stack"></div>
 </main>
 
 <!-- 99 Names -->
@@ -1752,6 +1783,9 @@ body:not(.has-nav) .player { padding-bottom: env(safe-area-inset-bottom, 0px); }
       if (evening) rows.reverse();
       top.appendChild(rows[0]);
       top.appendChild(rows[1]);
+      top.appendChild(linkRow("Duas after prayer", "Remembrance after salam, with reasons and translations", function () { go("dua", 25); }));
+      top.appendChild(linkRow("Duas for every situation", "Worry, travel, food, sickness and more, with why to say them", function () { go("situations"); }));
+      top.appendChild(linkRow("Saved duas", duaFav.length ? duaFav.length + " kept" : "Tap the heart on any dua to keep it here", function () { go("saveddua"); }));
       top.appendChild(linkRow("The 99 Names of Allah", "Asma ul Husna with meanings", function () { go("names"); }));
       D.cats.forEach(function (c) {
         cats.appendChild(el("p", "eyebrow group-title", c[0]));
@@ -1765,6 +1799,169 @@ body:not(.has-nav) .player { padding-bottom: env(safe-area-inset-bottom, 0px); }
           li.appendChild(b); ul.appendChild(li);
         });
         cats.appendChild(ul);
+      });
+    });
+  }
+  /* ---------- duas: translations, reasons, saved ---------- */
+  var DUA_LANGS = { en: "English", ml: "Malayalam", hi: "Hindi", ta: "Tamil" };
+  var duaLang = load("dualang", "en");
+  if (duaLang !== "off" && !DUA_LANGS[duaLang]) duaLang = "en";
+  var duaFav = load("duafav", []);
+  if (!Array.isArray(duaFav)) duaFav = [];
+  var duaTrWait = null;
+  function withDuaTr(done) {
+    if (window.DUATR) { done(true); return; }
+    if (duaTrWait) { duaTrWait.push(done); return; }
+    duaTrWait = [done];
+    var sc = document.createElement("script");
+    sc.src = "dua-tr.js";
+    var finish = function () { var l = duaTrWait; duaTrWait = null; l.forEach(function (f) { f(!!window.DUATR); }); };
+    sc.onload = finish;
+    sc.onerror = function () { sc.remove(); finish(); };
+    document.head.appendChild(sc);
+  }
+  function duaText(key, it) {
+    if (duaLang === "off") return null;
+    if (duaLang === "en") return it[4] ? { text: it[4], lang: "en" } : null;
+    var T = window.DUATR, k = key;
+    if (T) {
+      if (T.alias && T.alias[k]) k = T.alias[k];
+      var q = T.q && T.q[k];
+      if (q) {
+        var d = trData(duaLang);
+        if (d) {
+          var parts = [];
+          if (q[0] !== 2) parts.push(clean(d[0][0]));            // Bismillah, as the Qur'an reader shows it
+          for (var a = q[1]; a <= q[2]; a++) parts.push(clean(d[q[0] - 1][a - 1] || ""));
+          return { text: parts.join("\n"), lang: duaLang };
+        }
+      } else if (T.t && T.t[k] && T.t[k][duaLang]) return { text: T.t[k][duaLang], lang: duaLang };
+    }
+    return it[4] ? { text: it[4], lang: "en", fallback: true } : null;
+  }
+  function duaIsFav(key) { return duaFav.indexOf(key) >= 0; }
+  function duaToggleFav(key) {
+    var i = duaFav.indexOf(key);
+    if (i >= 0) duaFav.splice(i, 1); else duaFav.push(key);
+    save("duafav", duaFav);
+  }
+  function duaRepaint() {
+    if (page === "dua") renderDua(pageArg);
+    else if (page === "situations") renderSituations(true);
+    else if (page === "saveddua") renderSaved();
+  }
+  function duaBar() {
+    var bar = el("div", "dua-bar"), lab = el("label", null, "Translation"), sel = el("select");
+    lab.setAttribute("for", "dua-lang-" + page);
+    sel.id = "dua-lang-" + page;
+    [["en", "English"], ["ml", "Malayalam"], ["hi", "Hindi"], ["ta", "Tamil"], ["off", "None"]].forEach(function (o) {
+      var op = el("option", null, o[1]); op.value = o[0]; sel.appendChild(op);
+    });
+    sel.value = duaLang;
+    sel.addEventListener("change", function () {
+      duaLang = sel.value;
+      save("dualang", duaLang);
+      duaRepaint();
+    });
+    if (duaLang !== "off" && duaLang !== "en" && !trData(duaLang)) loadLang(duaLang, function (ok) { if (ok) duaRepaint(); });
+    bar.appendChild(lab); bar.appendChild(sel);
+    var wrap = el("div", "stack");
+    wrap.appendChild(bar);
+    if (duaLang === "ml" || duaLang === "hi" || duaLang === "ta")
+      wrap.appendChild(el("p", "note", DUA_LANGS[duaLang] + " lines for duas were written for this app and have not been checked by a scholar. Qur'an verses use the QuranEnc translations. Where a dua has no " + DUA_LANGS[duaLang] + " line yet, English is shown."));
+    return wrap;
+  }
+  function duaCard(it, key) {
+    var card = el("div", "dua");
+    if (it[3]) card.appendChild(el("p", "side", it[3]));
+    if (it[0]) { var ar = el("p", "ar", it[0]); ar.lang = "ar"; card.appendChild(ar); }
+    if (it[1]) card.appendChild(el("p", "tl", it[1]));
+    var tr = duaText(key, it);
+    if (tr) { var p = el("p", "en", tr.text); p.lang = tr.lang; card.appendChild(p); }
+    if (it[5]) card.appendChild(el("p", "side", it[5]));
+    var T = window.DUATR, why = T && T.why && T.why[key];
+    if (why) { var w = el("div", "why"); w.appendChild(el("b", null, "Why and when")); w.appendChild(el("span", null, why)); card.appendChild(w); }
+    var foot = el("div", "foot");
+    foot.appendChild(el("span", "ref", it[6]));
+    var acts = el("div", "acts");
+    if (it[2] > 1) {
+      var done = 0, rb = el("button", "rep", "0 / " + it[2]);
+      rb.type = "button";
+      rb.setAttribute("aria-label", "Repeat " + it[2] + " times. Tap to count.");
+      rb.addEventListener("click", function () {
+        done = done >= it[2] ? 0 : done + 1;
+        rb.textContent = done + " / " + it[2];
+        rb.classList.toggle("done", done >= it[2]);
+        if (done >= it[2]) { try { if (navigator.vibrate) navigator.vibrate(80); } catch (e) {} }
+      });
+      acts.appendChild(rb);
+    }
+    var hb = el("button", "heart");
+    hb.type = "button";
+    hb.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.4-7-9.6A4.4 4.4 0 0 1 12 7.6a4.4 4.4 0 0 1 7 2.8C19 15.6 12 20 12 20z"/></svg>';
+    var sync = function () { var on = duaIsFav(key); hb.setAttribute("aria-pressed", on ? "true" : "false"); hb.setAttribute("aria-label", on ? "Remove from saved duas" : "Save this dua"); hb.title = hb.getAttribute("aria-label"); };
+    sync();
+    hb.addEventListener("click", function () { duaToggleFav(key); sync(); if (page === "saveddua" && !duaIsFav(key)) renderSaved(); });
+    acts.appendChild(hb);
+    foot.appendChild(acts);
+    card.appendChild(foot);
+    return card;
+  }
+  function duaEntry(key) {
+    var c = key.split(":"), ch = chapterOf(+c[0]);
+    return ch && ch[2][+c[1]] ? ch[2][+c[1]] : null;
+  }
+  function renderSituations(keepOpen) {
+    var box = $("sit-list"), openIdx = [];
+    if (keepOpen) [].forEach.call(box.querySelectorAll("details"), function (d, i) { if (d.open) openIdx.push(i); });
+    box.textContent = "";
+    withDhikr(function (okay) {
+      if (page !== "situations") return;
+      if (!okay) { box.appendChild(el("p", "note", "Could not load the duas. Check your internet connection and open this page again.")); return; }
+      withDuaTr(function () {
+        if (page !== "situations") return;
+        var y = window.scrollY, T = window.DUATR;
+        box.textContent = "";
+        box.appendChild(duaBar());
+        ((T && T.situations) || []).forEach(function (s, si) {
+          var d = el("details", "sit"), sm = el("summary");
+          sm.appendChild(el("b", null, s.t)); sm.appendChild(el("small", null, s.why));
+          d.appendChild(sm);
+          var list = el("div", "stack");
+          d.appendChild(list);
+          var fill = function () {
+            if (list.childNodes.length) return;
+            s.items.forEach(function (ref) {
+              var key = ref[0] + ":" + ref[1], it = duaEntry(key);
+              if (it) list.appendChild(duaCard(it, key));
+            });
+          };
+          d.addEventListener("toggle", function () { if (d.open) fill(); });
+          if (openIdx.indexOf(si) >= 0) { d.open = true; fill(); }
+          box.appendChild(d);
+        });
+        window.scrollTo(0, y);
+      });
+    });
+  }
+  function renderSaved() {
+    var box = $("saved-list");
+    box.textContent = "";
+    withDhikr(function (okay) {
+      if (page !== "saveddua") return;
+      withDuaTr(function () {
+        if (page !== "saveddua") return;
+        var y = window.scrollY;
+        box.textContent = "";
+        if (!okay) { box.appendChild(el("p", "note", "Could not load the duas. Check your internet connection and open this page again.")); return; }
+        box.appendChild(duaBar());
+        var shown = 0;
+        duaFav.forEach(function (key) {
+          var it = duaEntry(key);
+          if (it) { box.appendChild(duaCard(it, key)); shown++; }
+        });
+        if (!shown) box.appendChild(el("p", "note", "Nothing saved yet. Tap the heart on any dua to keep it here."));
+        window.scrollTo(0, y);
       });
     });
   }
@@ -1783,29 +1980,13 @@ body:not(.has-nav) .player { padding-bottom: env(safe-area-inset-bottom, 0px); }
       }
       $("dua-title").textContent = ch[1];
       $("dua-sub").textContent = ch[2].length + (ch[2].length === 1 ? " entry" : " entries") + " · from Hisn al-Muslim";
-      ch[2].forEach(function (it) {
-        var card = el("div", "dua");
-        if (it[3]) card.appendChild(el("p", "side", it[3]));
-        if (it[0]) { var ar = el("p", "ar", it[0]); ar.lang = "ar"; card.appendChild(ar); }
-        if (it[1]) card.appendChild(el("p", "tl", it[1]));
-        if (it[4]) card.appendChild(el("p", "en", it[4]));
-        if (it[5]) card.appendChild(el("p", "side", it[5]));
-        var foot = el("div", "foot");
-        foot.appendChild(el("span", "ref", it[6]));
-        if (it[2] > 1) {
-          var done = 0, rb = el("button", "rep", "0 / " + it[2]);
-          rb.type = "button";
-          rb.setAttribute("aria-label", "Repeat " + it[2] + " times. Tap to count.");
-          rb.addEventListener("click", function () {
-            done = done >= it[2] ? 0 : done + 1;
-            rb.textContent = done + " / " + it[2];
-            rb.classList.toggle("done", done >= it[2]);
-            if (done >= it[2]) { try { if (navigator.vibrate) navigator.vibrate(80); } catch (e) {} }
-          });
-          foot.appendChild(rb);
-        }
-        if (it[6] || it[2] > 1) card.appendChild(foot);
-        box.appendChild(card);
+      withDuaTr(function () {
+        if (page !== "dua" || pageArg !== id || current) return;
+        var y = window.scrollY;
+        box.textContent = "";
+        box.appendChild(duaBar());
+        ch[2].forEach(function (it, i) { box.appendChild(duaCard(it, ch[0] + ":" + i)); });
+        window.scrollTo(0, y);
       });
     });
   }
@@ -1954,8 +2135,8 @@ body:not(.has-nav) .player { padding-bottom: env(safe-area-inset-bottom, 0px); }
   }
 
   /* ---------- moving between screens ---------- */
-  var VIEWS = ["home", "quran", "prayer", "qibla", "dhikr", "dua", "names", "tasbih"];
-  var NAV_OF = { dua: "dhikr", names: "dhikr", tasbih: "dhikr" };
+  var VIEWS = ["home", "quran", "prayer", "qibla", "dhikr", "dua", "names", "tasbih", "situations", "saveddua"];
+  var NAV_OF = { dua: "dhikr", names: "dhikr", tasbih: "dhikr", situations: "dhikr", saveddua: "dhikr" };
   var pendingAyah = 1, shown = false;
   function showPage(p, arg) {
     stopSpeaking();
@@ -1980,6 +2161,8 @@ body:not(.has-nav) .player { padding-bottom: env(safe-area-inset-bottom, 0px); }
     else if (p === "dhikr") renderDhikr();
     else if (p === "dua") renderDua(pageArg);
     else if (p === "names") renderNames();
+    else if (p === "situations") renderSituations();
+    else if (p === "saveddua") renderSaved();
     else renderTasbih();
     window.scrollTo(0, 0);
     syncPlayer();
